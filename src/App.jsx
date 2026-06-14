@@ -74,10 +74,12 @@ export default function App() {
         </Routes>        
       </main>      
       <Footer onTry={handleTry} currentStatus={isTry}/>
+      {/*
       <ElevenLabsWidget />
+      */}
+      <ChatWidget />
       {isTry && (
-        <div>
-        <ChatWidget />        
+        <div>        
         <button 
           onClick={() => setIsOpen(!isOpen)} 
           style={styles.floatingButton}

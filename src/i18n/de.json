@@ -32,7 +32,7 @@
   },
   "chat": {
     "title": "Chat mit mir",
-    "placeholder": "Fragen Sie mich über KI für lokale Unternehmen…",
+    "placeholder": "Buchen Sie Ihr Entdeckungsgespräch…",
     "clear": "Sind Sie sicher, dass Sie diese Unterhaltung löschen möchten?",
     "clearhistory": "Chat-Verlauf löschen",
     "localOllama": "Privat Chat Service",
@@ -43,7 +43,10 @@
     "enterApiKey": "Geben Sie Ihren API-Schlüssel ein",
     "save": "Speichern",
     "geminiKeyRequired": "Gemini API-Schlüssel erforderlich",
-    "editGeminiKey": "Gemini API-Schlüssel bearbeiten"
+    "editGeminiKey": "Gemini API-Schlüssel bearbeiten",
+    "stopPlayingVoice": "Hören Sie auf, die Stimme zu spielen",
+    "listeningClickToStop": "Zuhören... klicken, um zu stoppen",
+    "clickToSpeak": "Klicken Sie, um zu sprechen"
   },
   "about": {
     "eyebrow": "Mit wem Sie arbeiten",

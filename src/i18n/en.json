@@ -32,7 +32,7 @@
   },
   "chat": {
     "title": "Chat with me",
-    "placeholder": "Ask me anything about AI for local business…",
+    "placeholder": "Book your discovery call…",
     "clear": "Are you sure you want to clear this conversation?",
     "clearhistory": "Clear chat history",
     "localOllama": "Private Chat Service",
@@ -43,7 +43,10 @@
     "enterApiKey": "Enter your API key to connect to the Gemini Chat Service:",
     "save": "Save",
     "geminiKeyRequired": "Gemini API key required",
-    "editGeminiKey": "Edit Gemini API Key"
+    "editGeminiKey": "Edit Gemini API Key",
+    "stopPlayingVoice": "Stop playing voice",
+    "listeningClickToStop": "Listening... click to stop",
+    "clickToSpeak": "Click to speak"
   },
   "about": {
     "eyebrow": "Who you work with",

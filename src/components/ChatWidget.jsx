@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 // Import the configuration block from your project's shared config file
 import { useLang } from '../i18n/LanguageContext.jsx'
+import { useVoice } from "./useVoice.jsx";
+import { Mic, MicOff, Volume2, VolumeX, Send } from "lucide-react";
 
 export default function ChatWidget() {
-  const { t } = useLang()
+  const { t, lang } = useLang()
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -127,6 +129,22 @@ export default function ChatWidget() {
     return data.message.content;    
   };
 
+  const {
+    isListening,
+    transcript,
+    startListening,
+    stopListening,
+    speak,
+    isSpeaking,
+    stopSpeaking,
+  } = useVoice(lang);
+
+   useEffect(() => {
+    if (transcript) {
+      setInput((prev) => prev + " " + transcript);
+    }
+  }, [transcript]);
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!input.trim() || loading) return;
@@ -161,15 +179,16 @@ export default function ChatWidget() {
       {!isOpen && (
         <button 
           onClick={() => setIsOpen(true)}
-          style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: '#007bff', color: 'white', border: 'none', cursor: 'pointer', fontSize: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
+          style={{ height: '35px', borderRadius: '6px', padding: '6px 10px', backgroundColor: '#007bff', color: 'white', border: 'none', cursor: 'pointer', fontSize: '14px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
         >
           {provider === 'ollama' ? '🦙' : '✨'}
+          {t('widget.action')}
         </button>
       )}
 
       {/* Chat Window Frame */}
       {isOpen && (
-        <div style={{ width: '50vw', height: '480px', backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 5px 25px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid #eee' }}>
+        <div style={{ width: '70vw', height: '480px', backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 5px 25px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid #eee' }}>
           
           {/* Header Bar */}
           <div style={{ backgroundColor: '#007bff', color: 'white', padding: '10px 15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -229,6 +248,17 @@ export default function ChatWidget() {
                   wordWrap: 'break-word'
                 }}>
                   {msg.content}
+                  {msg.role !== "user" && (
+                    <button 
+                      onClick={() => {
+                        console.log('speaking');
+                        speak(msg.content)
+                      }} 
+                      style={{ background: "none", border: "none", cursor: "pointer", marginLeft: "5px", padding: 0, zIndex:999 }}
+                    >
+                      <Volume2 size={14} color="#555" />
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -265,23 +295,44 @@ export default function ChatWidget() {
 
           {/* Input Area */}
           <form onSubmit={handleSendMessage} style={{ padding: '12px', borderTop: '1px solid #eee', display: 'flex', gap: '8px' }}>
-            <input 
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder={t("chat.placeholder")}
-              disabled={loading || showKeyPrompt}
-              style={{ flex: 1, padding: '8px 12px', borderRadius: '6px', border: '1px solid #ddd', fontSize: '14px', outline: 'none' }}
-              onFocus={(e) => e.target.style.borderColor = '#007bff'}
-              onBlur={(e) => e.target.style.borderColor = '#ddd'}
-            />
-            <button 
-              type="submit"
-              disabled={loading || showKeyPrompt}
-              style={{ padding: '8px 15px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: 'bold', opacity: (loading || showKeyPrompt) ? 0.5 : 1 }}
-            >
-              {loading ? '...' : '→'}
-            </button>
+            {isSpeaking && (
+              <button onClick={stopSpeaking} style={{ display: "flex", alignItems: "center", gap: "5px", color: "red", background: "none", border: "none", cursor: "pointer", marginBottom: "5px" }}>
+                <VolumeX size={16} />{t('chat.stopPlayingVoice')}
+              </button>
+            )}
+            <div style={{ display: "flex", gap: "5px", width: "100%", alignItems: "center" }}>
+              <button
+                onClick={isListening ? stopListening : startListening}
+                style={{
+                  padding: "8px",
+                  borderRadius: "50%",
+                  border: "none",
+                  backgroundColor: isListening ? "#dc3545" : "#f0f2f5",
+                  color: isListening ? "#fff" : "#000",
+                  cursor: "pointer",
+                }}
+                title={isListening ? t('chat.listeningClickToStop') : t('chat.clickToSpeak')}
+              >
+                {isListening ? <MicOff size={18} /> : <Mic size={18} />}
+              </button>
+              <input 
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder={t("chat.placeholder")}
+                disabled={loading || showKeyPrompt}
+                style={{ flex: 1, padding: '8px 12px', borderRadius: '6px', border: '1px solid #ddd', fontSize: '14px', outline: 'none' }}
+                onFocus={(e) => e.target.style.borderColor = '#007bff'}
+                onBlur={(e) => e.target.style.borderColor = '#ddd'}
+              />
+              <button 
+                type="submit"
+                disabled={loading || showKeyPrompt}
+                style={{ padding: '8px 15px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: 'bold', opacity: (loading || showKeyPrompt) ? 0.5 : 1 }}
+              >
+                {loading ? '...' : '→'}
+              </button>
+            </div>
           </form>
         </div>
       )}
