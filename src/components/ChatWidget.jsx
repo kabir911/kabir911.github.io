@@ -100,7 +100,7 @@ export default function ChatWidget() {
     }
   };
 
-  // Handler for Local Ollama API and Gemini Calls
+  // Handler for Local Ollama API and Gemini Calls (Python agent)
   const callAPI = async (route, chatHistory, userMsg) => {
     
     const payload = route === 0 ? {
@@ -127,6 +127,27 @@ export default function ChatWidget() {
     if (!response.ok) { throw new Error(`Server responded with status ${response.status}`); }
     const data = await response.json();
     return data.message.content;    
+  };
+
+  const calln8nAgent = async (userMsg) => {
+    
+    const payload = {
+      sessionId: sessionId,
+      chatInput: userMsg
+    };
+
+    console.log('payload:',payload);
+    const response = await fetch(
+      CHAT_CONFIG.gemini.url,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }
+    );
+    if (!response.ok) { throw new Error(`Server responded with status ${response.status}`); }
+    const data = await response.json();
+    return data.output;    
   };
 
   const {
@@ -159,7 +180,7 @@ export default function ChatWidget() {
       if (provider === 'ollama') {
         replyText = await callAPI(0, messages, userMessage);
       } else {
-        replyText = await callAPI(1, messages, userMessage);        
+        replyText = await calln8nAgent(userMessage);        
       }
 
       setMessages((prev) => [...prev, { role: 'assistant', content: replyText }]);

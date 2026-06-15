@@ -465,7 +465,7 @@
           "parameters": [
             {
               "name": "To",
-              "value": "=whatsapp:{{ $(\"Webhook\").item.json.body.phone }}"
+              "value": "=whatsapp:{{ $('Webhook').isExecuted ? $('Webhook').item.json.body.phone : $('Execute Workflow Trigger').item.json.phone }}\n"
             },
             {
               "name": "From",
@@ -477,7 +477,7 @@
             },
             {
               "name": "ContentVariables",
-              "value": "={{ \n{\n\"1\":$(\"Webhook\").item.json.body.date,\n\"2\":$(\"Webhook\").item.json.body.time\n} \n}}"
+              "value": "={{ \n{\n\"1\":$('Webhook').isExecuted ? $('Webhook').item.json.body.date : $('Execute Workflow Trigger').item.json.date,\n\"2\":$('Webhook').isExecuted ? $('Webhook').item.json.body.time : $('Execute Workflow Trigger').item.json.time\n} \n}}"
             }
           ]
         },
@@ -510,7 +510,7 @@
           "parameters": [
             {
               "name": "To",
-              "value": "=whatsapp:{{ $(\"Webhook\").item.json.body.phone }}"
+              "value": "=whatsapp:{{ $('Webhook').isExecuted ? $('Webhook').item.json.body.phone : $('Execute Workflow Trigger').item.json.phone }}"
             },
             {
               "name": "From",
@@ -522,7 +522,7 @@
             },
             {
               "name": "ContentVariables",
-              "value": "={{ \n{\n\"1\":$(\"Webhook\").item.json.body.date,\n\"2\":$(\"Webhook\").item.json.body.time\n} \n}}"
+              "value": "={{ \n{\n\"1\":$('Webhook').isExecuted ? $('Webhook').item.json.body.date : $('Execute Workflow Trigger').item.json.date,\n\"2\":$('Webhook').isExecuted ? $('Webhook').item.json.body.time : $('Execute Workflow Trigger').item.json.time\n} \n}}"
             }
           ]
         },
@@ -562,7 +562,7 @@
           "values": [
             {
               "column": "id",
-              "value": "={{ $(\"Webhook\").item.json.body.id }}"
+              "value": "={{ $('Webhook').isExecuted ? $('Webhook').item.json.body.id : $('Execute Workflow Trigger').item.json.id }}"
             }
           ]
         },
@@ -582,6 +582,69 @@
           "name": "Postgres account"
         }
       }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  body: {{ $json }}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -800,
+        -160
+      ],
+      "id": "6f076d69-756d-4601-b351-532d5c7aad86",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "date"
+            },
+            {
+              "name": "wished_date"
+            },
+            {
+              "name": "name"
+            },
+            {
+              "name": "phone"
+            },
+            {
+              "name": "timestamp",
+              "type": "number"
+            },
+            {
+              "name": "lang"
+            },
+            {
+              "name": "action"
+            },
+            {
+              "name": "time"
+            },
+            {
+              "name": "id"
+            },
+            {
+              "name": "delay_hours",
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1024,
+        -160
+      ],
+      "id": "dba83d01-1dcf-4705-9cc6-967558eeb1b3",
+      "name": "Execute Workflow Trigger"
     }
   ],
   "pinData": {
@@ -778,6 +841,28 @@
           }
         ]
       ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -788,7 +873,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "2246f05b-17ef-4008-b4c0-4c5312e76bed",
+  "versionId": "9231e515-edd9-40f6-99dc-0762676b197b",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "3ea6496d728c98b23597b446bd009c2394751dfb58d237e69346212a0717cf14"

@@ -470,6 +470,62 @@
           "name": "Bearer Auth account"
         }
       }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "action"
+            },
+            {
+              "name": "date"
+            },
+            {
+              "name": "time"
+            },
+            {
+              "name": "name"
+            },
+            {
+              "name": "email"
+            },
+            {
+              "name": "phone"
+            },
+            {
+              "name": "video_call",
+              "type": "boolean"
+            },
+            {
+              "name": "BookingUid"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1024,
+        -160
+      ],
+      "id": "edfc66ec-371f-40be-ad25-0313f0caec12",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  body: {{ $json }}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -816,
+        -160
+      ],
+      "id": "95a96612-506a-47ac-856a-d4d52e746c74",
+      "name": "Aggregate"
     }
   ],
   "pinData": {
@@ -640,6 +696,28 @@
           }
         ]
       ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -650,7 +728,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "8832d964-3fd0-4090-9490-459802fcb507",
+  "versionId": "fda09049-1860-4e04-b77a-2f95db23e688",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "3ea6496d728c98b23597b446bd009c2394751dfb58d237e69346212a0717cf14"

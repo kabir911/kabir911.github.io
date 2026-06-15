@@ -1,0 +1,1041 @@
+{
+  "name": "khaleque-it-appointments-agent",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "[warmly] Hello, thank you for calling KKhaleque IT Consulting. My name is Eric, and I am an AI assistant to help local businesses in the Frankfurt am Main area explore how practical AI can boost their success. How can I assist you today?",
+        "options": {
+          "allowedOrigins": "https://khaleque-it.com,http://localhost:5173"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -992,
+        -32
+      ],
+      "id": "188b74eb-4687-4978-bfc6-ce43715c6be5",
+      "name": "When chat message received",
+      "webhookId": "545af70e-1685-44a7-b718-779eb81fcfee"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=Today is {{ $today }}\n    ### Personality\n    You are a professional and helpful virtual assistant for KKhaleque IT Consulting, based in Frankfurt am Main, Germany.\n    You represent a company that provides practical AI and IT consulting services to local businesses in the Frankfurt Rhine-Main region, focusing on growing revenue and cutting costs without hype or a big IT department.\n    You are knowledgeable about our services, which include automated customer service, intelligent answering, marketing content generation, AI graphic design, automated scheduling, meeting notes, workflow automation, local SEO, data insights, and secure AI adoption.\n    You are friendly, efficient, and reassuring, always aiming to understand the caller's needs while highlighting the value of a discovery call.\n    The current business time zone is CET. Always interpret relative statements (like 'tomorrow' or 'next Monday') based on this time zone. Do not use UTC.\n\n    ### Environment\n    You are handling inbound phone calls from potential clients who are local business owners in the Frankfurt am Main area.\n    The caller is interested in leveraging AI for their business and is looking to understand how KKhaleque IT Consulting can help.\n    You have access to information about our services and the process for scheduling a free 30-minute discovery call.\n    The conversation should be focused on qualifying the lead and scheduling this initial consultation.\n\n    ### Tone\n    Your responses are professional, friendly, and clear, typically keeping explanations concise and to the point.\n    You speak with a confident and reassuring tone, using natural conversational elements like \"I see\" or \"Absolutely\" and appropriate pauses to sound authentic.\n    You adapt your language to the caller's technical understanding, avoiding jargon where possible or explaining it simply.\n    You periodically check for understanding and ensure the caller feels heard and valued.\n    You optimize your speech for natural text-to-speech delivery, using strategic pauses (marked by \"...\") and emphasis on key information.\n    When providing contact details or times, you will speak them clearly, for example, reading phone numbers with pauses between segments.\n\n    ### Goal\n    Your primary goal is to identify the caller's AI needs and successfully schedule a free 30-minute discovery call (either in-person or via video call) with KKhaleque IT Consulting.\n\n    1.  **Initial Qualification:**\n        -   Warmly greet the caller and confirm they've reached KKhaleque IT Consulting.\n        -   Briefly explain KKhaleque IT Consulting's focus on practical AI for local Frankfurt businesses.\n        -   Identify the caller's primary area of interest or specific AI need (e.g., customer service, marketing, automation).\n        -   Confirm the caller represents a local business in the Frankfurt am Main region.\n\n    2.  **Value Proposition & Discovery Call Explanation:**\n        -   Briefly explain how KKhaleque IT Consulting helps businesses (e.g., 35+ years experience, no jargon, focus on measurable results).\n        -   Introduce the free 30-minute discovery call as the next step to understand their business, identify opportunities, and create a plain-language plan.\n        -   Explain that the call can be in-person or via video, based on their preference.\n\n    3.  **Scheduling a new Discovery Call:**    \n        -   Offer to schedule the discovery call immediately.\n        -   Collect the caller's full name, business name, email address, and phone number.\n        -   Ask for their preferred meeting type (in-person or video call).\n        -   If no appointments are available for the date preferred by the caller then use the tool add_desired_booking to save the desired booking details of the discovery call before proposing alternatives. You will need to save the name, phone number, date and timestamp of the desired booking\n        -   Propose available dates and times for the 30-minute call use the tool get_available_slots to get the free appointment slots for the given date.\n        -   Confirm all appointment details (date, time, type, and contact information).\n        -   Call the tool add_calendar_booking to add the appointment for the given date. Do not attempt to add bookings until you have found a free slot\n        -   When calling add_calendar_booking, wait for the tool output. Once the tool returns a video_call_link, inform the user that a Google Meet link has been successfully generated and will be sent to their email address.\n        \n    OR\n\n    3.1  **Cancel or move an existing Discovery Call:**\n        - The caller may want to cancel or move an already scheduled discovery call.\n        - If the caller wishes to move an discovery call treat this as a cancellation of the existing discovery call and the addition of the new discovery call.\n        - Collect the caller's full name, date and time of their scheduled call.\n        - Check if there is a discovery call scheduled for this date and time that matches the name of the caller using the tool get_calendar_bookings\n        - Use the tool cancel_calendar_booking passing the event_id of the calendar entry to cancel the appointment, offer to reschedule the appointment using the approach in step 3\n        \n    3.2 **After a found discovery call has been cancelled as a result of a cancellation or move:**\n        - Using the tool get_wished_bookings_for_date find the desired bookings for the cancellation date. Review the list returned in the next turn and for each desired booking call the tool send_delayed_message setting the parameters to that of the desired booking values. For each desired booking increment the delay_hours parameter starting from 0\n\n    4.  **Confirmation & Next Steps:**\n        -   Provide a brief confirmation of the scheduled call and what to expect.\n        -   Thank the caller for their interest.\n\n    If the caller attempts to get free consulting during this call, politely redirect them to the discovery call as the appropriate forum for detailed discussions. If they are not a local business in the Frankfurt am Main area, politely explain the service area focus and offer to answer general questions if possible, but prioritize local clients for discovery calls.\n\n    Success is measured by the successful scheduling of a qualified discovery call and the collection of accurate contact information.\n\n    ### Guardrails\n    -   Never provide specific technical advice, solutions, or detailed project quotes during this initial call; always direct these inquiries to the discovery call.\n    -   Do not discuss pricing beyond the mention of the free 30-minute discovery call.\n    -   Maintain a professional and helpful demeanor, even if the caller is demanding or unclear.\n    -   If a caller is outside the Frankfurt am Main service area, politely explain our local focus and suggest they still book a video call if they are interested, or decline if it's a clear mismatch.\n    -   Do not speculate or invent information if you don't know the answer; instead, state that the consultant will address it during the discovery call.\n    -   Ensure all collected information is directly relevant to scheduling the discovery call and respect privacy.\n    -   Do not engage in discussions about competitors or provide opinions on other service providers.",
+          "maxIterations": 10
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -752,
+        -32
+      ],
+      "id": "dfef822f-cba8-4dbf-b6ae-8a90db55d41b",
+      "name": "Appointments Gemini agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -976,
+        240
+      ],
+      "id": "f07235a1-8f05-46e1-bb57-4b6ed5291bc3",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "WaPrDGszbMfUnCxC",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "includeTime": false,
+        "options": {
+          "timezone": "Europe/Berlin"
+        }
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        -992,
+        -256
+      ],
+      "id": "c9fcf021-25dc-4a3d-9a16-5d13d2685b23",
+      "name": "Date & Time"
+    },
+    {
+      "parameters": {
+        "description": "Tool  Name: get_calendar_bookings \nDescription: Fetches bookings for a given date                                     \n\nArgs:\n        action (string): The action to perform always set to \"get\". (required)\n        date (string): A date to get calendar bookings for (e.g., \"2024-07-01\").The date in YYYY-MM-DD format. Never pass relative text like 'tomorrow'. (required)\n       \nReturns:\n       json array: A json array containing all the bookings for the specified date - the start times are formatted YYYY-MM-DDTHH:MM:00.000Z i.e the slots are UTC times",
+        "workflowId": {
+          "__rl": true,
+          "value": "8Ieozue3TRCq9qIA",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/8Ieozue3TRCq9qIA",
+          "cachedResultName": "Appointment bookings (cal.com)"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "action": "get",
+            "date": "={{ $fromAI('date','The date for which to retrieve the calendar bookings') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "action",
+              "displayName": "action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "time",
+              "displayName": "time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "video_call",
+              "displayName": "video_call",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "boolean",
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -432,
+        240
+      ],
+      "id": "ca863c80-7734-420f-9e15-c4a658cade54",
+      "name": "get_calendar_bookings"
+    },
+    {
+      "parameters": {
+        "description": "Tool  Name: get_free_slots\nDescription: Fetches free booking slots for a given date                                     \n\nArgs:\n        action (string): The action to perform always set to \"check\". (required)\n        date (string): The date for which to check for free calendar slots (e.g., \"2024-07-01\").The date in YYYY-MM-DD format. Never pass relative text like 'tomorrow'. (required)\n\nReturns:\n       json array: A json array containing all the free slots for the specified date - the start times are formatted YYYY-MM-DDTHH:MM:00.000Z i.e the slots are UTC times",
+        "workflowId": {
+          "__rl": true,
+          "value": "8Ieozue3TRCq9qIA",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/8Ieozue3TRCq9qIA",
+          "cachedResultName": "Appointment bookings (cal.com)"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "action": "check",
+            "date": "={{ $fromAI('date','The date for which to retrieve the free calendar slots') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "action",
+              "displayName": "action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "time",
+              "displayName": "time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "video_call",
+              "displayName": "video_call",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "boolean",
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -192,
+        240
+      ],
+      "id": "2e3e659f-ad3b-4f87-919a-a8d6eaac5939",
+      "name": "get_free_slots"
+    },
+    {
+      "parameters": {
+        "description": "Tool  Name: add_calendar_booking\nDescription: Adds a booking for a given date and time\n\nArgs:\n        action (string): The action to perform always set to \"book\". (required)\n        date (string): The date of the booking (e.g., \"2024-07-01\"). The date in YYYY-MM-DD format. Never pass relative text like 'tomorrow'. (required)\n        time (string): The time of the booking (e.g., \"10:00\"). The time in HH:MM format, using 24-hour time. Never pass relative text like 'in an hour'. (required)\n        name (string): The full name of the person booking the appointment. (required)\n        email (string): The email address of the person booking the appointment. (required)\n        phone (string): The phone number of the person booking the appointment. (required)\n        video_call (boolean): Whether the meeting is a video call. (required)\n        \nReturns:\n        json: A json object containing the result of the booking operation, including a mock video call link if applicable.",
+        "workflowId": {
+          "__rl": true,
+          "value": "8Ieozue3TRCq9qIA",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/8Ieozue3TRCq9qIA",
+          "cachedResultName": "Appointment bookings (cal.com)"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "video_call": "={{ $fromAI('video_call','If true then a video call was requested otherwise false', 'boolean') }}",
+            "action": "book",
+            "date": "={{ $fromAI('date','The date of the booking in YYYY-MM-DD format') }}",
+            "time": "={{ $fromAI('time','The time of the booking in 24hrs formatted HH:MM') }}",
+            "name": "={{ $fromAI('name','The name of who is making the booking') }}",
+            "email": "={{ $fromAI('email','The email of who is making the booking') }}",
+            "phone": "={{ $fromAI('phone','The phone of who is making the booking') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "action",
+              "displayName": "action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "time",
+              "displayName": "time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "video_call",
+              "displayName": "video_call",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "boolean"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        240
+      ],
+      "id": "4cabb2b7-7da1-4aff-9979-685d138896a6",
+      "name": "add_calendar_booking"
+    },
+    {
+      "parameters": {
+        "description": "Tool  Name: cancel_calendar_booking\nDescription: Cancels an existing booking\n\nArgs:\n        action (string): The action to perform always set to \"cancel\". (required)\n        BookingUid (str): The unique identifier of the calendar event to be canceled.(required)\n\nReturns:\n       json array: A json array containing all the free slots for the specified date - the start times are formatted YYYY-MM-DDTHH:MM:00.000Z i.e the slots are UTC times",
+        "workflowId": {
+          "__rl": true,
+          "value": "8Ieozue3TRCq9qIA",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/8Ieozue3TRCq9qIA",
+          "cachedResultName": "Appointment bookings (cal.com)"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "action": "cancel",
+            "BookingUid": "={{ $fromAI('BookingUid','The BookingUid of the calendar entry to cancel') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "action",
+              "displayName": "action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "time",
+              "displayName": "time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "video_call",
+              "displayName": "video_call",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "boolean",
+              "removed": true
+            },
+            {
+              "id": "BookingUid",
+              "displayName": "BookingUid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        -16
+      ],
+      "id": "9e6dd1dc-3360-4a38-bd89-bc78c56185e0",
+      "name": "cancel_calendar_booking"
+    },
+    {
+      "parameters": {
+        "description": "Tool  Name: get_wished_bookings_for_date\nDescription: Fetches the desired bookings for a given date\n\nArgs:\n        action (string): The action to perform always set to \"get\". (required)\n        date (string): The date to get check for desired bookings (e.g., \"2024-07-01\").The date in YYYY-MM-DD format. Never pass relative text like 'tomorrow'. (required)\n\nReturns:\n       json array: A json array containing all the free slots for the specified date - the start times are formatted YYYY-MM-DDTHH:MM:00.000Z i.e the slots are UTC times",
+        "workflowId": {
+          "__rl": true,
+          "value": "9AT8BPnZhACA9a15",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/9AT8BPnZhACA9a15",
+          "cachedResultName": "Desired bookings (supabase)"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "date": "={{ $fromAI('date','The date for which to retrieve the wished bookings') }}",
+            "action": "=get"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "wished_date",
+              "displayName": "wished_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": true
+            },
+            {
+              "id": "lang",
+              "displayName": "lang",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "action",
+              "displayName": "action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "time",
+              "displayName": "time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "delay_hours",
+              "displayName": "delay_hours",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -432,
+        464
+      ],
+      "id": "3571a8d5-a47f-42ce-8094-8d89cd7d48e7",
+      "name": "get_wished_bookings_for_date"
+    },
+    {
+      "parameters": {
+        "description": "Tool  Name: add_wished_booking\nDescription: Adds a desired booking for a given date i.e. the customer would like an appointment on a date where there are no available slots\n\nArgs:\n        action (string): The action to perform always set to \"add\". (required)\nwished_date (str): The wished date for the booking (e.g., \"2024-07-01\"). The date in YYYY-MM-DD format. Never pass relative text like 'tomorrow'. (required)\n        name (str): The full name of the person booking the appointment. (required)\n        phone (str): The phone number of the person booking the appointment. (required)\n        timestamp (int): The unix timestamp for the entry (required)\n        lang (str): The language the user is communication with the LLM either en for English or de for German (required)\n        \nReturns:\n        json: A json object containing the result of the booking operation, including a mock video call link if applicable.",
+        "workflowId": {
+          "__rl": true,
+          "value": "9AT8BPnZhACA9a15",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/9AT8BPnZhACA9a15",
+          "cachedResultName": "Desired bookings (supabase)"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "wished_date": "={{ $fromAI('wished_date', 'The date when the appointment was desired') }}",
+            "name": "={{ $fromAI('name', 'The name of the person with the desired appointment') }}",
+            "phone": "={{ $fromAI('phone', 'The phone of the person with the desired appointment') }}",
+            "timestamp": "={{ Number($fromAI('timestamp', 'The unix timestamp foof that the desired appointment was made', 'number')) }}",
+            "lang": "={{$fromAI('lang', 'The language code of the person with the desired appointment e.g de for German otherwise en for English') }}",
+            "action": "=add"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "wished_date",
+              "displayName": "wished_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number"
+            },
+            {
+              "id": "lang",
+              "displayName": "lang",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "action",
+              "displayName": "action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "time",
+              "displayName": "time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "delay_hours",
+              "displayName": "delay_hours",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -176,
+        464
+      ],
+      "id": "347d9532-841c-4695-848d-f77ef3351dc2",
+      "name": "add_wished_booking"
+    },
+    {
+      "parameters": {
+        "description": "Tool  Name: send_delayed_message\nDescription: Send a delayed message to a customer that had a desired booking\nArgs:\n        action (string): The action to perform always set to \"send\". (required)\n        id (str): The id for the desired booking.\n        phone (str): The phone number for the customer.\n        lang (str): The short language code for the desired booking\n        delay_hours (int): The delay in hours for the message to be sent.\n        date (str): The date of the cancelled booking now available (e.g., \"2024-07-01\"). The date in YYYY-MM-DD format. Never pass relative text like 'tomorrow'.\n        time (str): The time of the cancelled booking now available (e.g., \"10:00\"). The time in HH:MM format, using 24-hour time. Never pass relative text like 'in an hour'.\n        \nReturns:\n        json: A json object containing the result of the booking operation, including a mock video call link if applicable.",
+        "workflowId": {
+          "__rl": true,
+          "value": "9AT8BPnZhACA9a15",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/9AT8BPnZhACA9a15",
+          "cachedResultName": "Desired bookings (supabase)"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "date": "={{ $fromAI('date','The date of the booking slot that has become available') }}",
+            "phone": "={{ $fromAI('phone','The phone of the desired booking that should be notified') }}",
+            "lang": "={{ $fromAI('lang','The language code of the desired booking that should be notified e.g de for German otherwise en for English') }}",
+            "action": "send",
+            "time": "={{ $fromAI('time','The time of the booking slot that has become available') }}",
+            "id": "={{ $fromAI('id','The id of the booking slot that has become available') }}",
+            "delay_hours": "={{ $fromAI('delay_hours','The delay in hours to wait before sending the notification', 'number') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "wished_date",
+              "displayName": "wished_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": true
+            },
+            {
+              "id": "lang",
+              "displayName": "lang",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "action",
+              "displayName": "action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "time",
+              "displayName": "time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "delay_hours",
+              "displayName": "delay_hours",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        464
+      ],
+      "id": "427c310a-0ff9-43fe-9adf-9c2bdede2805",
+      "name": "send_delay_message"
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 30
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.4,
+      "position": [
+        -720,
+        240
+      ],
+      "id": "a673bae8-551f-4d3b-aec6-bdb74000b067",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "TX5AzUQUFlbrJPQS",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Appointments Gemini agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Appointments Gemini agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Appointments Gemini agent": {
+      "main": [
+        []
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "Appointments Gemini agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_calendar_bookings": {
+      "ai_tool": [
+        [
+          {
+            "node": "Appointments Gemini agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_free_slots": {
+      "ai_tool": [
+        [
+          {
+            "node": "Appointments Gemini agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add_calendar_booking": {
+      "ai_tool": [
+        [
+          {
+            "node": "Appointments Gemini agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cancel_calendar_booking": {
+      "ai_tool": [
+        [
+          {
+            "node": "Appointments Gemini agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_wished_bookings_for_date": {
+      "ai_tool": [
+        [
+          {
+            "node": "Appointments Gemini agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add_wished_booking": {
+      "ai_tool": [
+        [
+          {
+            "node": "Appointments Gemini agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "send_delay_message": {
+      "ai_tool": [
+        [
+          {
+            "node": "Appointments Gemini agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Appointments Gemini agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "7bd7bed5-6359-4d81-a545-270976405b35",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3ea6496d728c98b23597b446bd009c2394751dfb58d237e69346212a0717cf14"
+  },
+  "nodeGroups": [],
+  "id": "dxSW6VGPGuCwxpm2",
+  "tags": []
+}
