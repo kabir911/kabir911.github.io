@@ -1,5 +1,5 @@
 {
-  "name": "Cal.com calendar assistant",
+  "name": "Appointment bookings (cal.com)",
   "nodes": [
     {
       "parameters": {
@@ -17,66 +17,6 @@
       "id": "2d74c115-389d-4fce-99bd-90d34bc4c714",
       "name": "Webhook",
       "webhookId": "f5bc2932-9c44-421f-924d-332609dfed07"
-    },
-    {
-      "parameters": {
-        "operation": "getAll",
-        "calendar": {
-          "__rl": true,
-          "value": "primary",
-          "mode": "list"
-        },
-        "returnAll": true,
-        "options": {
-          "timeMin": "={{ $json.body.date }}T00:00:00Z",
-          "timeMax": "={{ $json.body.date }}T23:59:59Z",
-          "singleEvents": true
-        }
-      },
-      "type": "n8n-nodes-base.googleCalendar",
-      "typeVersion": 1,
-      "position": [
-        592,
-        -224
-      ],
-      "id": "21039d75-8659-4ddf-a3a5-a7f92e95cc1b",
-      "name": "Google Calendar - Get Events",
-      "credentials": {
-        "googleCalendarOAuth2Api": {
-          "id": "h03vRmHDXpEjWf0k",
-          "name": "Google Calendar account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "calendar": {
-          "__rl": true,
-          "value": "kabir911.kk@gmail.com",
-          "mode": "list",
-          "cachedResultName": "kabir911.kk@gmail.com"
-        },
-        "start": "={{ DateTime.fromISO($json.body.date + 'T' + $json.body.time).toFormat(\"yyyy-MM-dd'T'HH:mmZZ\") }}",
-        "end": "={{ DateTime.fromISO($json.body.date + 'T' + $json.body.time).plus({ minutes: 30 }).toFormat(\"yyyy-MM-dd'T'HH:mmZZ\") }}",
-        "additionalFields": {
-          "description": "=Automatic booking by ElevenLabs Voice AI Assistant - {{ $json.body.name }} contactable on {{ $json.body.phone }} with email {{ $json.body.email }}",
-          "summary": "=  IT Consultation - {{ $json.body.name }}"
-        }
-      },
-      "type": "n8n-nodes-base.googleCalendar",
-      "typeVersion": 1,
-      "position": [
-        592,
-        352
-      ],
-      "id": "4e4b4963-f5af-4273-a741-53241da76acf",
-      "name": "Google Calendar - Create Event",
-      "credentials": {
-        "googleCalendarOAuth2Api": {
-          "id": "h03vRmHDXpEjWf0k",
-          "name": "Google Calendar account"
-        }
-      }
     },
     {
       "parameters": {
@@ -107,44 +47,6 @@
       ],
       "id": "2296e45b-3727-42cc-9c7b-93c932826790",
       "name": "Respond Slots"
-    },
-    {
-      "parameters": {
-        "calendar": {
-          "__rl": true,
-          "value": "kabir911.kk@gmail.com",
-          "mode": "list",
-          "cachedResultName": "kabir911.kk@gmail.com"
-        },
-        "start": "={{ DateTime.fromISO($json.body.date + 'T' + $json.body.time).toFormat(\"yyyy-MM-dd'T'HH:mmZZ\") }}",
-        "end": "={{ DateTime.fromISO($json.body.date + 'T' + $json.body.time).plus({ minutes: 30 }).toFormat(\"yyyy-MM-dd'T'HH:mmZZ\") }}",
-        "additionalFields": {
-          "attendees": [
-            ""
-          ],
-          "conferenceDataUi": {
-            "conferenceDataValues": {
-              "conferenceSolution": "hangoutsMeet"
-            }
-          },
-          "description": "=Automatic booking by ElevenLabs Voice AI Assistant - {{ $json.body.name }} contactable on {{ $json.body.phone }} with email {{ $json.body.email }}",
-          "summary": "=  IT Consultation - {{ $json.body.name }}"
-        }
-      },
-      "type": "n8n-nodes-base.googleCalendar",
-      "typeVersion": 1,
-      "position": [
-        592,
-        144
-      ],
-      "id": "d006c395-d3b1-425c-8086-c59936a693ef",
-      "name": "Google Calendar - Create Event (VC)",
-      "credentials": {
-        "googleCalendarOAuth2Api": {
-          "id": "h03vRmHDXpEjWf0k",
-          "name": "Google Calendar account"
-        }
-      }
     },
     {
       "parameters": {
@@ -179,33 +81,6 @@
       ],
       "id": "59972d33-b9d4-4d95-8192-73c37b10b872",
       "name": "with video call"
-    },
-    {
-      "parameters": {
-        "operation": "delete",
-        "calendar": {
-          "__rl": true,
-          "value": "kabir911.kk@gmail.com",
-          "mode": "list",
-          "cachedResultName": "kabir911.kk@gmail.com"
-        },
-        "eventId": "={{ $json.body.event_id }}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.googleCalendar",
-      "typeVersion": 1.3,
-      "position": [
-        592,
-        -48
-      ],
-      "id": "05b6322c-39a4-41d0-ab48-0eb9a2e34522",
-      "name": "Delete an event",
-      "credentials": {
-        "googleCalendarOAuth2Api": {
-          "id": "h03vRmHDXpEjWf0k",
-          "name": "Google Calendar account"
-        }
-      }
     },
     {
       "parameters": {
@@ -643,21 +518,6 @@
         ]
       ]
     },
-    "Google Calendar - Get Events": {
-      "main": [
-        []
-      ]
-    },
-    "Google Calendar - Create Event": {
-      "main": [
-        []
-      ]
-    },
-    "Google Calendar - Create Event (VC)": {
-      "main": [
-        []
-      ]
-    },
     "with video call": {
       "main": [
         [
@@ -674,11 +534,6 @@
             "index": 0
           }
         ]
-      ]
-    },
-    "Delete an event": {
-      "main": [
-        []
       ]
     },
     "If": {
@@ -795,7 +650,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "d1fd6ff2-fc20-4fe4-b82e-2b217bdf650c",
+  "versionId": "8832d964-3fd0-4090-9490-459802fcb507",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "3ea6496d728c98b23597b446bd009c2394751dfb58d237e69346212a0717cf14"

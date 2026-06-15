@@ -1,0 +1,261 @@
+{
+  "name": "Picsart Generation (Twilio/WhatsApp)",
+  "nodes": [
+    {
+      "parameters": {
+        "fromEmail": "support@divm.com",
+        "toEmail": "kabir@divm.com",
+        "subject": "Generated Video",
+        "html": "=<h1>Generated Video Message</h1>\n<ul>\n<li>From: {{ $(\"Webhook\").item.json.body.From }}</li>\n<li>To: {{ $(\"Webhook\").item.json.body.To }}</li>\n<li>Text: {{ $(\"Webhook\").item.json.body.Body }}</li>\n<li>Number Of Media: {{ $(\"Webhook\").item.json.body.NumMedia }}</li>\n<li>MediaType: {{ $(\"Webhook\").item.json.body.MediaContentType0 }}</li>\n<li>Public Url: {{ $(\"Webhook\").item.json.body.MediaUrl0 }}</li>\n<li>Generated Video: {{ $json.videoUrl }}</li>\n</ul>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -336,
+        -32
+      ],
+      "id": "58f061f7-24fc-4e2e-898c-70389361aac8",
+      "name": "Send an Email",
+      "webhookId": "f83edaa2-45d6-4ff8-8337-d7005e6c17b0",
+      "credentials": {
+        "smtp": {
+          "id": "vtjgErTCUb5siuhK",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-inbound",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -880,
+        -32
+      ],
+      "id": "0047936f-abdd-427c-8763-9fab8df565c9",
+      "name": "Webhook",
+      "webhookId": "1c112432-c003-473f-bc81-87a29f9cdca9"
+    },
+    {
+      "parameters": {
+        "operation": "Generate Video from Prompt and Image",
+        "image2VideoImageUrl": "={{ $json.body.MediaUrl0 }}",
+        "image2VideoPrompt": "={{ $json.body.Body }}",
+        "image2VideoAudio": true
+      },
+      "type": "@picsart/n8n-nodes-picsart-creative-apis.picsartGeneration",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        -32
+      ],
+      "id": "57c6e466-9e30-4e91-88a3-e04986e4728a",
+      "name": "Picsart Generative AI-Hub",
+      "credentials": {
+        "picsartApi": {
+          "id": "G8UsY1qLCtsM4844",
+          "name": "Picsart account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://genai-api.picsart.io/v1/video/{{ $json.inferenceId }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "picsartApi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -592,
+        240
+      ],
+      "id": "7dcfe197-0f90-4b09-8a25-251433c7ec72",
+      "name": "HTTP Request",
+      "credentials": {
+        "picsartApi": {
+          "id": "G8UsY1qLCtsM4844",
+          "name": "Picsart account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "aba4acb3-a0ca-4a0f-97cd-92676ed24295",
+              "leftValue": "={{ $json.result.status }}",
+              "rightValue": "success",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -336,
+        240
+      ],
+      "id": "c997beb9-7ec1-4252-a54b-99635b4009f4",
+      "name": "is ready"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -864,
+        240
+      ],
+      "id": "51da5256-7ca4-4c7d-a9c9-5ef2103c2eec",
+      "name": "Wait",
+      "webhookId": "31f3911c-3806-44ca-89af-1ef0cfaa1f15"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/ACe80f579eda6bbfa93d742ffc35f45ae9/Messages.json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "twilioApi",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "From",
+              "value": "={{ $('Webhook').item.json.body.To }}"
+            },
+            {
+              "name": "To",
+              "value": "={{ $('Webhook').item.json.body.From }}"
+            },
+            {
+              "name": "MediaUrl",
+              "value": "={{ $('Picsart Generative AI-Hub').item.json.videoUrl }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -48,
+        -32
+      ],
+      "id": "1e4ea176-25d4-4198-a6e5-7767b2b5af5b",
+      "name": "Twilio WhatsApp Response",
+      "credentials": {
+        "twilioApi": {
+          "id": "1rx71NqoFn2BpFpN",
+          "name": "Twilio account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Picsart Generative AI-Hub",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Picsart Generative AI-Hub": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an Email": {
+      "main": [
+        [
+          {
+            "node": "Twilio WhatsApp Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "is ready",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "is ready": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "939da211-9cc2-46fa-933d-27bd2d843a24",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3ea6496d728c98b23597b446bd009c2394751dfb58d237e69346212a0717cf14"
+  },
+  "nodeGroups": [],
+  "id": "2GIXcx2VvskrZYXC",
+  "tags": []
+}

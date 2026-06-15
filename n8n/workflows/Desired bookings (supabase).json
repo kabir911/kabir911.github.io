@@ -1,0 +1,799 @@
+{
+  "name": "Desired bookings (supabase)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "wished-booking",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1024,
+        48
+      ],
+      "id": "52e52a74-6a79-4f4c-aeb5-93b4d2e8754b",
+      "name": "Webhook",
+      "webhookId": "7ba71176-fb84-4916-a73b-297f6e3fb5f1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8e7174ef-eba6-4429-8cb0-1dc9d0c8c6cd",
+              "leftValue": "={{ $json.headers.origin || $json.headers.referer || '' }}",
+              "rightValue": "https://khaleque-it.com",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "942c08f8-7e17-4481-8efe-949c112451d8",
+              "leftValue": "={{ $json.headers.origin || $json.headers.referer || '' }}",
+              "rightValue": "http://localhost:5173",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -800,
+        48
+      ],
+      "id": "b5c72a6b-a622-400e-bea2-2efede0e5226",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "{\"error\": \"Unauthorized origin domain.\"}",
+        "options": {
+          "responseCode": 403
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -816,
+        288
+      ],
+      "id": "c3b48ded-a47a-4860-bdeb-4a6b8fa827cd",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.action }}",
+                    "rightValue": "get",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "d00666f1-61ca-4b13-b911-fc1f7bfe5786"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "get"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c3e49cce-353d-421d-ab5c-ad9a4ddcb556",
+                    "leftValue": "={{ $json.body.action }}",
+                    "rightValue": "add",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "add"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -592,
+        16
+      ],
+      "id": "41e79f1b-3dbf-415b-adb4-36a2c888f0bb",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "wished_bookings",
+          "mode": "list",
+          "cachedResultName": "wished_bookings"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "wished_date": "={{  $json.body.wished_date }}",
+            "name": "={{  $json.body.name }}",
+            "phone": "={{  $json.body.phone }}",
+            "lang": "={{  $json.body.lang }}",
+            "timestamp": "={{ new Date($json.body.timestamp * 1000).toISOString() }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "wished_date",
+              "displayName": "wished_date",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "lang",
+              "displayName": "lang",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -336,
+        32
+      ],
+      "id": "56f767a8-0509-4f17-9a6d-163eafcc074e",
+      "name": "Insert rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "TX5AzUQUFlbrJPQS",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "wished_bookings",
+          "mode": "list",
+          "cachedResultName": "wished_bookings"
+        },
+        "where": {
+          "values": [
+            {
+              "column": "wished_date",
+              "value": "={{ $json.body.date }}"
+            }
+          ]
+        },
+        "sort": {
+          "values": [
+            {
+              "column": "timestamp",
+              "direction": "DESC"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -336,
+        -160
+      ],
+      "id": "d1d63086-8236-42b2-91e8-a303aedcbe2d",
+      "name": "Select rows from a table",
+      "credentials": {
+        "postgres": {
+          "id": "TX5AzUQUFlbrJPQS",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": "={{ $json.body.delay_hours * 3600 }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -336,
+        288
+      ],
+      "id": "b0e017b9-0284-47c5-a143-db05e64dbb8c",
+      "name": "Wait",
+      "webhookId": "9b447c33-e485-4422-b165-d09cd9cc5015"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://mxcsfg3rqluuvsmu.myfritz.net:5679/webhook/elevenlabs-booking",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "origin",
+              "value": "http://localhost:5173"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "date",
+              "value": "={{ $json.body.date }}"
+            },
+            {
+              "name": "action",
+              "value": "check"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -336,
+        544
+      ],
+      "id": "fd2d6e37-1c1e-4299-b6f1-b59934c0aef3",
+      "name": "check for free slots"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6f16d3a0-f0d1-4db9-859f-0d2946968bb7",
+              "leftValue": "={{ Object.values($json.data)[0].length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -96,
+        544
+      ],
+      "id": "c6ebfae4-6749-4363-82f9-6b969a79e4c9",
+      "name": "check no. of free slots"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        -592,
+        288
+      ],
+      "id": "8a1e67c6-8bb4-4e80-a849-ea55abf16421",
+      "name": "Respond Success Wait"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -160
+      ],
+      "id": "10eacff0-eb18-4956-9bcf-27d919b2fd3a",
+      "name": "Respond Success"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "=$(\"Webhook\").item.json.body.lang",
+                    "rightValue": "de",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "dc4bfaab-046c-49c6-af42-f47df16d0c0a"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "de"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -336,
+        768
+      ],
+      "id": "1f318c2f-8bdd-4f03-a8fa-8e7152c5a858",
+      "name": "language switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/ACe80f579eda6bbfa93d742ffc35f45ae9/Messages.json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "twilioApi",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "To",
+              "value": "=whatsapp:{{ $(\"Webhook\").item.json.body.phone }}"
+            },
+            {
+              "name": "From",
+              "value": "whatsapp:+15559797509"
+            },
+            {
+              "name": "ContentSid",
+              "value": "HXf366ed78d287acd97665ff512098375a"
+            },
+            {
+              "name": "ContentVariables",
+              "value": "={{ \n{\n\"1\":$(\"Webhook\").item.json.body.date,\n\"2\":$(\"Webhook\").item.json.body.time\n} \n}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -336,
+        992
+      ],
+      "id": "b4afc883-f2a1-43a3-8c14-a589ab5b9633",
+      "name": "Twilio WhatsApp (en)",
+      "credentials": {
+        "twilioApi": {
+          "id": "1rx71NqoFn2BpFpN",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/ACe80f579eda6bbfa93d742ffc35f45ae9/Messages.json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "twilioApi",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "To",
+              "value": "=whatsapp:{{ $(\"Webhook\").item.json.body.phone }}"
+            },
+            {
+              "name": "From",
+              "value": "whatsapp:+15559797509"
+            },
+            {
+              "name": "ContentSid",
+              "value": "HXf366ed78d287acd97665ff512098375a"
+            },
+            {
+              "name": "ContentVariables",
+              "value": "={{ \n{\n\"1\":$(\"Webhook\").item.json.body.date,\n\"2\":$(\"Webhook\").item.json.body.time\n} \n}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -96,
+        768
+      ],
+      "id": "b25d453a-1e2a-49a2-b76d-3b8237d44f3b",
+      "name": "Twilio WhatsApp (de)",
+      "credentials": {
+        "twilioApi": {
+          "id": "1rx71NqoFn2BpFpN",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteTable",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "wished_bookings",
+          "mode": "list",
+          "cachedResultName": "wished_bookings"
+        },
+        "deleteCommand": "delete",
+        "where": {
+          "values": [
+            {
+              "column": "id",
+              "value": "={{ $(\"Webhook\").item.json.body.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -96,
+        992
+      ],
+      "id": "3b467fee-65c3-41d5-975e-96cd32999953",
+      "name": "Delete desired booking",
+      "credentials": {
+        "postgres": {
+          "id": "TX5AzUQUFlbrJPQS",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "mxcsfg3rqluuvsmu.myfritz.net:5679",
+            "x-real-ip": "172.19.0.1",
+            "x-forwarded-for": "172.19.0.1",
+            "x-forwarded-proto": "https",
+            "x-forwarded-host": "mxcsfg3rqluuvsmu.myfritz.net:5679",
+            "connection": "upgrade",
+            "content-length": "115",
+            "user-agent": "curl/8.15.0",
+            "accept": "*/*",
+            "content-type": "application/json"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "action": "book",
+            "date": "2026-06-05",
+            "time": "14:00",
+            "name": "Max Mustermann",
+            "phone": "+491701234567"
+          },
+          "webhookUrl": "https://mxcsfg3rqluuvsmu.myfritz.net:5679/webhook/elevenlabs-booking",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Select rows from a table",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond Success Wait",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "check for free slots",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert rows in a table": {
+      "main": [
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check for free slots": {
+      "main": [
+        [
+          {
+            "node": "check no. of free slots",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check no. of free slots": {
+      "main": [
+        [
+          {
+            "node": "language switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Select rows from a table": {
+      "main": [
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond Success Wait": {
+      "main": [
+        []
+      ]
+    },
+    "language switch": {
+      "main": [
+        [
+          {
+            "node": "Twilio WhatsApp (de)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Twilio WhatsApp (en)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twilio WhatsApp (en)": {
+      "main": [
+        [
+          {
+            "node": "Delete desired booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twilio WhatsApp (de)": {
+      "main": [
+        [
+          {
+            "node": "Delete desired booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "2246f05b-17ef-4008-b4c0-4c5312e76bed",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3ea6496d728c98b23597b446bd009c2394751dfb58d237e69346212a0717cf14"
+  },
+  "nodeGroups": [],
+  "id": "9AT8BPnZhACA9a15",
+  "tags": []
+}
