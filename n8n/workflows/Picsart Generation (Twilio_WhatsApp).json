@@ -12,8 +12,8 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
       "position": [
-        -336,
-        -32
+        -352,
+        368
       ],
       "id": "58f061f7-24fc-4e2e-898c-70389361aac8",
       "name": "Send an Email",
@@ -34,8 +34,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -880,
-        -32
+        -864,
+        112
       ],
       "id": "0047936f-abdd-427c-8763-9fab8df565c9",
       "name": "Webhook",
@@ -51,8 +51,8 @@
       "type": "@picsart/n8n-nodes-picsart-creative-apis.picsartGeneration",
       "typeVersion": 1,
       "position": [
-        -608,
-        -32
+        -592,
+        112
       ],
       "id": "57c6e466-9e30-4e91-88a3-e04986e4728a",
       "name": "Picsart Generative AI-Hub",
@@ -65,23 +65,39 @@
     },
     {
       "parameters": {
-        "url": "=https://genai-api.picsart.io/v1/video/{{ $json.inferenceId }}",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "picsartApi",
-        "options": {}
+        "operation": "sendAndWait",
+        "fromEmail": "support@divm.com",
+        "toEmail": "kabir@divm.com",
+        "subject": "Approval Required",
+        "message": "=Please review the following context for posting approval\n\n<h1>Generated Video Message</h1>\n<ul>\n<li>From: {{ $(\"Webhook\").item.json.body.From }}</li>\n<li>To: {{ $(\"Webhook\").item.json.body.To }}</li>\n<li>Text: {{ $(\"Webhook\").item.json.body.Body }}</li>\n<li>Number Of Media: {{ $(\"Webhook\").item.json.body.NumMedia }}</li>\n<li>MediaType: {{ $(\"Webhook\").item.json.body.MediaContentType0 }}</li>\n<li>Public Url: {{ $(\"Webhook\").item.json.body.MediaUrl0 }}</li>\n<li>Generated Video: {{ $json.videoUrl }}</li>\n</ul>",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double"
+          }
+        },
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "resumeAmount": 45,
+              "resumeUnit": "minutes"
+            }
+          },
+          "appendAttribution": true
+        }
       },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
       "position": [
-        -592,
-        240
+        -336,
+        112
       ],
-      "id": "7dcfe197-0f90-4b09-8a25-251433c7ec72",
-      "name": "HTTP Request",
+      "id": "5a4e1c45-0c6a-4a60-ab95-876c0ab0c1b3",
+      "name": "Email approve/decline",
+      "webhookId": "da07e556-f499-4f33-8e09-502c6563719d",
       "credentials": {
-        "picsartApi": {
-          "id": "G8UsY1qLCtsM4844",
-          "name": "Picsart account"
+        "smtp": {
+          "id": "vtjgErTCUb5siuhK",
+          "name": "SMTP account"
         }
       }
     },
@@ -91,47 +107,75 @@
           "options": {
             "caseSensitive": true,
             "leftValue": "",
-            "typeValidation": "strict",
+            "typeValidation": "loose",
             "version": 3
           },
           "conditions": [
             {
-              "id": "aba4acb3-a0ca-4a0f-97cd-92676ed24295",
-              "leftValue": "={{ $json.result.status }}",
-              "rightValue": "success",
+              "id": "a53e2791-dd05-4875-bf2e-2d2d1d6dc3f3",
+              "leftValue": "={{ $json.data.approve }}",
+              "rightValue": "approve",
               "operator": {
-                "type": "string",
-                "operation": "equals",
-                "name": "filter.operator.equals"
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
               }
             }
           ],
           "combinator": "and"
         },
+        "looseTypeValidation": true,
         "options": {}
       },
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -336,
-        240
+        -112,
+        112
       ],
-      "id": "c997beb9-7ec1-4252-a54b-99635b4009f4",
-      "name": "is ready"
+      "id": "aeac8703-1fa3-44de-b93d-0a3d51317a7e",
+      "name": "If"
     },
     {
       "parameters": {
-        "amount": 10
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/ACe80f579eda6bbfa93d742ffc35f45ae9/Messages.json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "twilioApi",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "From",
+              "value": "={{ $('Webhook').item.json.body.To }}"
+            },
+            {
+              "name": "To",
+              "value": "={{ $('Webhook').item.json.body.From }}"
+            },
+            {
+              "name": "Body",
+              "value": "Video was declined and not posted"
+            }
+          ]
+        },
+        "options": {}
       },
-      "type": "n8n-nodes-base.wait",
-      "typeVersion": 1.1,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
       "position": [
-        -864,
-        240
+        112,
+        352
       ],
-      "id": "51da5256-7ca4-4c7d-a9c9-5ef2103c2eec",
-      "name": "Wait",
-      "webhookId": "31f3911c-3806-44ca-89af-1ef0cfaa1f15"
+      "id": "d96fec76-e12f-4ae7-b0a1-bf2bf9c7eb3a",
+      "name": "Twilio WhatsApp Response Decline",
+      "credentials": {
+        "twilioApi": {
+          "id": "1rx71NqoFn2BpFpN",
+          "name": "Twilio account"
+        }
+      }
     },
     {
       "parameters": {
@@ -154,6 +198,10 @@
             {
               "name": "MediaUrl",
               "value": "={{ $('Picsart Generative AI-Hub').item.json.videoUrl }}"
+            },
+            {
+              "name": "Body",
+              "value": "Video approved and posted"
             }
           ]
         },
@@ -162,20 +210,381 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        -48,
-        -32
+        112,
+        112
       ],
       "id": "1e4ea176-25d4-4198-a6e5-7767b2b5af5b",
-      "name": "Twilio WhatsApp Response",
+      "name": "Twilio WhatsApp Response Approve",
       "credentials": {
         "twilioApi": {
           "id": "1rx71NqoFn2BpFpN",
           "name": "Twilio account"
         }
       }
+    },
+    {
+      "parameters": {
+        "trigger": [
+          "message"
+        ],
+        "channelId": {
+          "__rl": true,
+          "value": "C0BAQ0ND1KM",
+          "mode": "list",
+          "cachedResultName": "ai-generation"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [
+        -864,
+        -224
+      ],
+      "id": "b1b35c0d-4704-4af9-a836-fb7431bcb0a4",
+      "name": "Slack Trigger",
+      "webhookId": "7173b67e-467b-463c-ba59-5362e4a0bf2d",
+      "credentials": {
+        "slackApi": {
+          "id": "UGbsyhNdLK0k5zix",
+          "name": "Slack account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "support@divm.com",
+        "toEmail": "kabir@divm.com",
+        "subject": "Generated Video",
+        "html": "=<h1>Generated Video Message</h1>\n<ul>\n<li>From: {{ $('Slack Trigger').item.json.user }}</li>\n<li>To: generator</li>\n<li>Text: {{ $('Slack Trigger').item.json.text }}</li>\n<li>Number Of Media: {{ $('Slack Trigger').item.json.files.length }}</li>\n<li>MediaType: {{ $('Slack Trigger').item.json.files[0].filetype }}</li>\n<li>Public Url: {{ $('Extract Direct Image URL').item.json.direct_public_image_url }}</li>\n<li>Generated Video: https://smartdater.biz/video.html?file={{ $('Picsart Generative AI-Hub (slack)').item.json.videoUrl }}</li>\n</ul>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        368,
+        -224
+      ],
+      "id": "c44b0282-8840-49f1-a494-eca8de3f1dfc",
+      "name": "Send test email",
+      "webhookId": "f83edaa2-45d6-4ff8-8337-d7005e6c17b0",
+      "credentials": {
+        "smtp": {
+          "id": "vtjgErTCUb5siuhK",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3b04805b-2356-42a5-893e-b01d361ee3bb",
+              "name": "direct_public_image_url",
+              "value": "={{ $json.files[0].url_private }}?pub_secret={{ $json.files[0].permalink_public.split('-').pop() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "222416f0-6dbc-450f-aae9-cd057c7908e1",
+      "name": "Extract Direct Image URL",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -416,
+        -224
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "847453b5-8da5-40cf-92f3-73347463be24",
+              "leftValue": "={{ Array.isArray($json.files) && $json.files.length > 0 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "884895e6-d39f-482b-9ab7-743b669fe41e",
+              "leftValue": "={{ $json.user }}",
+              "rightValue": "U0BAY6H1S9F",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -656,
+        -224
+      ],
+      "id": "d99f3f5c-c603-498c-a95f-2ce08fb525d3",
+      "name": "Has Image and Text"
+    },
+    {
+      "parameters": {
+        "operation": "Generate Video from Prompt and Image",
+        "image2VideoImageUrl": "=https://mxcsfg3rqluuvsmu.myfritz.net:5679/webhook/11a481dd-501f-4aa3-b186-0d96317fa564?name={{ $('Slack Download File').item.json.files[0].id }}-{{ $('Slack Download File').item.json.files[0].name }}",
+        "image2VideoPrompt": "={{ $('Slack Download File').item.json.text }}",
+        "image2VideoAudio": true
+      },
+      "type": "@picsart/n8n-nodes-picsart-creative-apis.picsartGeneration",
+      "typeVersion": 1,
+      "position": [
+        176,
+        -224
+      ],
+      "id": "bcb59912-9b0a-42e9-aa6f-558b993457df",
+      "name": "Picsart Generative AI-Hub (slack)",
+      "credentials": {
+        "picsartApi": {
+          "id": "G8UsY1qLCtsM4844",
+          "name": "Picsart account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/data/{{ $('Extract Direct Image URL').item.json.files[0].id }}-{{ $('Extract Direct Image URL').item.json.files[0].name }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        -32,
+        -224
+      ],
+      "id": "a51f7338-e8a8-400f-bccc-3b059a5b2852",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.files[0].url_private_download }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "slackOAuth2Api",
+        "options": {
+          "response": {
+            "response": {}
+          }
+        }
+      },
+      "id": "ff8ee40d-9208-4e3f-b69b-830c95bc46fa",
+      "name": "Slack Download File",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -224,
+        -224
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "BvVbl7Ku2tRjdlUU",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0BAQ0ND1KM",
+          "mode": "list",
+          "cachedResultName": "ai-generation"
+        },
+        "text": "={{ $json.error }}",
+        "otherOptions": {
+          "thread_ts": {
+            "replyValues": {}
+          },
+          "unfurl_links": false,
+          "unfurl_media": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.5,
+      "position": [
+        752,
+        -16
+      ],
+      "id": "abd36d2d-6ae5-453e-ae06-9d0f43737203",
+      "name": "Error message",
+      "webhookId": "916b796e-feaf-488a-9ae4-533fda36dbed",
+      "credentials": {
+        "slackApi": {
+          "id": "UGbsyhNdLK0k5zix",
+          "name": "Slack account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0BAQ0ND1KM",
+          "mode": "list",
+          "cachedResultName": "ai-generation"
+        },
+        "text": "=Post has been approved",
+        "otherOptions": {
+          "unfurl_links": false,
+          "unfurl_media": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.5,
+      "position": [
+        992,
+        -16
+      ],
+      "id": "a84dab6e-a65c-434e-9d1f-a10a8fbd5173",
+      "name": "Post Approved",
+      "webhookId": "916b796e-feaf-488a-9ae4-533fda36dbed",
+      "credentials": {
+        "slackApi": {
+          "id": "UGbsyhNdLK0k5zix",
+          "name": "Slack account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a53e2791-dd05-4875-bf2e-2d2d1d6dc3f3",
+              "leftValue": "={{ $json.query.action }}",
+              "rightValue": "approve",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1200,
+        -224
+      ],
+      "id": "128d279d-16c4-416c-b03b-a7625c431021",
+      "name": "is approved"
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "httpMethod": "POST",
+        "limitWaitTime": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        992,
+        -224
+      ],
+      "id": "335786c4-449a-4ead-8b3d-63a18885044c",
+      "name": "Wait For Approval",
+      "webhookId": "c66d3a22-3e57-4eae-bde1-c53e01aa7be6"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        -224
+      ],
+      "id": "3de7d050-2334-45d0-8b02-892aaa01ea69",
+      "name": "Get Wait URL"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0BAQ0ND1KM",
+          "mode": "list",
+          "cachedResultName": "ai-generation"
+        },
+        "messageType": "block",
+        "blocksUi": "={\n  \"blocks\": [\n      {\n            \"type\": \"video\",\n            \"title\": { \"type\": \"plain_text\", \"text\": \"Generated Video\" },\n            \"video_url\": \"https://smartdater.biz/video.html?file={{ $('Picsart Generative AI-Hub (slack)').item.json.videoUrl }}\",\n            \"thumbnail_url\": \"{{ $('Extract Direct Image URL').item.json.direct_public_image_url }}\",\n            \"alt_text\": \"Video thumbnail preview\"\n      },\n      {\n          \"type\": \"actions\",\n          \"elements\": [\n              {\n                  \"type\": \"button\",\n                  \"text\": {\n                      \"type\": \"plain_text\",\n                      \"text\": \"Approve\",\n                      \"emoji\": true\n                  },\n                  \"value\": \"{{ $execution.resumeUrl }}&action=approve\",\n                  \"action_id\": \"actionId-0\"\n              },\n              {\n                  \"type\": \"button\",\n                  \"text\": {\n                      \"type\": \"plain_text\",\n                      \"text\": \"Decline\"\n                  },\n                  \"value\": \"{{ $execution.resumeUrl }}&action=approve\",\n                  \"action_id\": \"actionId-1\"\n              }\n          ]\n      }\n  ]\n}\n",
+        "text": "={{ $('Slack Trigger').item.json.text }}",
+        "otherOptions": {
+          "unfurl_links": true,
+          "unfurl_media": true
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.5,
+      "position": [
+        752,
+        -224
+      ],
+      "id": "e445c97b-7d97-4915-9541-debcd795a7ff",
+      "name": "Send For Approval",
+      "webhookId": "916b796e-feaf-488a-9ae4-533fda36dbed",
+      "credentials": {
+        "slackApi": {
+          "id": "UGbsyhNdLK0k5zix",
+          "name": "Slack account 2"
+        }
+      },
+      "onError": "continueErrorOutput"
     }
   ],
-  "pinData": {},
+  "pinData": {
+    "Extract Direct Image URL": [
+      {
+        "json": {
+          "files": [
+            {
+              "id": "F0BAX5EM11B"
+            }
+          ],
+          "direct_public_image_url": "https://files.slack.com/files-pri/T0BAESLUQJK-F0BAX5EM11B/20200926_201312.jpg?pub_secret=14bed5b9af"
+        }
+      }
+    ]
+  },
   "connections": {
     "Webhook": {
       "main": [
@@ -192,7 +601,7 @@
       "main": [
         [
           {
-            "node": "Send an Email",
+            "node": "Email approve/decline",
             "type": "main",
             "index": 0
           }
@@ -201,43 +610,161 @@
     },
     "Send an Email": {
       "main": [
+        []
+      ]
+    },
+    "Email approve/decline": {
+      "main": [
         [
           {
-            "node": "Twilio WhatsApp Response",
+            "node": "If",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "HTTP Request": {
+    "If": {
       "main": [
         [
           {
-            "node": "is ready",
+            "node": "Twilio WhatsApp Response Approve",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Twilio WhatsApp Response Decline",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Wait": {
+    "Slack Trigger": {
       "main": [
         [
           {
-            "node": "HTTP Request",
+            "node": "Has Image and Text",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "is ready": {
+    "Extract Direct Image URL": {
       "main": [
-        [],
         [
           {
-            "node": "Wait",
+            "node": "Slack Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Image and Text": {
+      "main": [
+        [
+          {
+            "node": "Extract Direct Image URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Picsart Generative AI-Hub (slack)": {
+      "main": [
+        [
+          {
+            "node": "Send test email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Picsart Generative AI-Hub (slack)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Download File": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send test email": {
+      "main": [
+        [
+          {
+            "node": "Get Wait URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "is approved": {
+      "main": [
+        [
+          {
+            "node": "Post Approved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait For Approval": {
+      "main": [
+        [
+          {
+            "node": "is approved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Wait URL": {
+      "main": [
+        [
+          {
+            "node": "Send For Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send For Approval": {
+      "main": [
+        [
+          {
+            "node": "Wait For Approval",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error message",
             "type": "main",
             "index": 0
           }
@@ -250,7 +777,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "939da211-9cc2-46fa-933d-27bd2d843a24",
+  "versionId": "9fcc3fa4-abad-4a24-bb88-36b2a74d989c",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "3ea6496d728c98b23597b446bd009c2394751dfb58d237e69346212a0717cf14"

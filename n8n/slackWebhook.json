@@ -1,0 +1,104 @@
+{
+  "type": "block_actions",
+  "user": {
+    "id": "U0BAY6H1S9F",
+    "username": "kabir911.kk",
+    "name": "kabir911.kk",
+    "team_id": "T0BAESLUQJK"
+  },
+  "api_app_id": "A0BB0PASBDJ",
+  "token": "RHm40dfiQpqDWq2G5P626Avw",
+  "container": {
+    "type": "message",
+    "message_ts": "1781769608.406019",
+    "channel_id": "C0BAQ0ND1KM",
+    "is_ephemeral": false
+  },
+  "trigger_id": "11383398275475.11354904976631.42cc0166e66dcb223e6f9bd84f0cd523",
+  "team": {
+    "id": "T0BAESLUQJK",
+    "domain": "khaleque-it"
+  },
+  "enterprise": null,
+  "is_enterprise_install": false,
+  "channel": {
+    "id": "C0BAQ0ND1KM",
+    "name": "privategroup"
+  },
+  "message": {
+    "user": "U0BATR0CZ4M",
+    "type": "message",
+    "ts": "1781769608.406019",
+    "bot_id": "B0BAV5196RL",
+    "app_id": "A0BB0PASBDJ",
+    "text": "Generate me a fast and furious style video of this car winning a race with appropriate background music",
+    "team": "T0BAESLUQJK",
+    "blocks": [
+      {
+        "type": "video",
+        "block_id": "AIXYL",
+        "video_url": "https:\\/\\/smartdater.biz\\/video.html?file=https:\\/\\/cdn.picsart.io\\/af8a6b4b-87fc-4f1a-a81b-b94943b96e9b.mp4",
+        "thumbnail_url": "https:\\/\\/files.slack.com\\/files-pri\\/T0BAESLUQJK-F0BC5SEKKUY\\/20210723_180527.jpg?pub_secret=3153c91a15",
+        "alt_text": "Video thumbnail preview",
+        "title": {
+          "type": "plain_text",
+          "text": "Generated Video",
+          "emoji": true
+        }
+      },
+      {
+        "type": "actions",
+        "block_id": "8Hsdl",
+        "elements": [
+          {
+            "type": "button",
+            "action_id": "actionId-0",
+            "text": {
+              "type": "plain_text",
+              "text": "Approve",
+              "emoji": true
+            },
+            "value": "https:\\/\\/mxcsfg3rqluuvsmu.myfritz.net:5679\\/webhook-waiting\\/1175?signature=423dbb5faa67a5a454921d38f479f959d935cc8c91aff13a71cbd4fab5941cdc?action=approve?"
+          },
+          {
+            "type": "button",
+            "action_id": "actionId-1",
+            "text": {
+              "type": "plain_text",
+              "text": "Decline",
+              "emoji": true
+            },
+            "value": "https:\\/\\/mxcsfg3rqluuvsmu.myfritz.net:5679\\/webhook-waiting\\/1175?signature=423dbb5faa67a5a454921d38f479f959d935cc8c91aff13a71cbd4fab5941cdc?action=approve"
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "block_id": "+asDD",
+        "text": {
+          "type": "mrkdwn",
+          "text": "_Automated with this <https:\\/\\/mxcsfg3rqluuvsmu.myfritz.net:5679\\/workflow\\/dJKLiufWIR426Pqy?utm_source=n8n-internal&amp;utm_medium=powered_by&amp;utm_campaign=n8n-nodes-base.slack_3ea6496d728c98b23597b446bd009c2394751dfb58d237e69346212a0717cf14|n8n workflow>_",
+          "verbatim": false
+        }
+      }
+    ]
+  },
+  "state": {
+    "values": {}
+  },
+  "response_url": "https:\\/\\/hooks.slack.com\\/actions\\/T0BAESLUQJK\\/11387688740422\\/YsCPIVLLS8dkghEWSBZZ70b3",
+  "actions": [
+    {
+      "action_id": "actionId-0",
+      "block_id": "8Hsdl",
+      "text": {
+        "type": "plain_text",
+        "text": "Approve",
+        "emoji": true
+      },
+      "value": "https:\\/\\/mxcsfg3rqluuvsmu.myfritz.net:5679\\/webhook-waiting\\/1175?signature=423dbb5faa67a5a454921d38f479f959d935cc8c91aff13a71cbd4fab5941cdc?action=approve?",
+      "type": "button",
+      "action_ts": "1781769617.827164"
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "name": "file server",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "11a481dd-501f-4aa3-b186-0d96317fa564",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -256,
+        -64
+      ],
+      "id": "da7573e4-ad9d-4be4-be2b-5aea96575d65",
+      "name": "Webhook",
+      "webhookId": "11a481dd-501f-4aa3-b186-0d96317fa564",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "fileSelector": "=/data/{{ $json.query.name }}",
+        "options": {
+          "dataPropertyName": "data"
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        -48,
+        -64
+      ],
+      "id": "c9a40f47-c109-4019-9f98-0177caa50b05",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "respondWith": "binary",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        144,
+        -64
+      ],
+      "id": "f61d1836-ea7a-4f0b-86fa-5077a1ec91e3",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ab0009f7-3677-433b-ba06-bb84f73d398e",
+  "meta": {
+    "instanceId": "3ea6496d728c98b23597b446bd009c2394751dfb58d237e69346212a0717cf14"
+  },
+  "nodeGroups": [],
+  "id": "c27CO4jXZAyM6Qtx",
+  "tags": []
+}

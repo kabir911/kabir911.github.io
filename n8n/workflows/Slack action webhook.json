@@ -1,0 +1,66 @@
+{
+  "name": "Slack action webhook",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "c8308915-2416-4e66-985b-d5825785cc2a",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "87ea0d9b-941d-4a0e-aed5-81e393005095",
+      "name": "Webhook",
+      "webhookId": "c8308915-2416-4e66-985b-d5825785cc2a"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ JSON.parse($json.body.payload).actions[0].value }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "6e308d93-d8a2-4aa4-8598-b840f662ef94",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "a8b3f4d9-eb3d-4d1c-87d1-5ace678416c6",
+  "meta": {
+    "instanceId": "3ea6496d728c98b23597b446bd009c2394751dfb58d237e69346212a0717cf14"
+  },
+  "nodeGroups": [],
+  "id": "IJtc5oMyrjYokxPX",
+  "tags": []
+}
