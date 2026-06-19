@@ -1,82 +1,121 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState } from 'react';
+import SoftPhone from 'react-softphone';
 
-export function useVoice(language = "en-US") {
-  const [isListening, setIsListening] = useState(false);
-  const [transcript, setTranscript] = useState("");
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const recognitionRef = useRef(null);
-
-  // Initialize Speech Recognition (Speech-to-Text)
-  useEffect(() => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      console.warn("Speech recognition not supported in this browser.");
-      return;
-    }
-
-    const recognition = new SpeechRecognition();
-    recognition.continuous = false; 
-    recognition.interimResults = false;
-    recognition.lang = language;
-
-    recognition.onstart = () => setIsListening(true);
-    recognition.onend = () => setIsListening(false);
-    
-    recognition.onresult = (event) => {
-      const text = event.results[0][0].transcript;
-      setTranscript(text);
-    };
-
-    recognitionRef.current = recognition;
-  }, [language]);
-
-  // Start listening
-  const startListening = () => {
-    if (recognitionRef.current) {
-      setTranscript("");
-      recognitionRef.current.start();
-    }
+export default function useVoice() {
+  // State to control softphone visibility
+  const [softPhoneOpen, setSoftPhoneOpen] = useState(false);
+  
+  // Your SIP server configuration
+  const sipConfig = {
+    domain: '://fonoster',        // Your SIP domain
+    // uri: 'sip:your-extension@your-sip-server.com',  // Your SIP URI
+    user: 'agent101',
+    password: 'your-sip-password',        // Your SIP password
+    ws_servers: 'ws://localhost:5063/ws', // WebSocket server
+    display_name: 'WebRTC User',            // Display name for calls
+    debug: false,                         // Set to true for debugging
+    session_timers_refresh_method: 'invite'
   };
 
-  // Stop listening manually
-  const stopListening = () => {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
-    }
+  // Settings state with localStorage persistence
+  const [callVolume, setCallVolume] = useState(() => {
+    const saved = localStorage.getItem('softphone-call-volume');
+    return saved ? parseFloat(saved) : 0.8;
+  });
+  
+  const [ringVolume, setRingVolume] = useState(() => {
+    const saved = localStorage.getItem('softphone-ring-volume');
+    return saved ? parseFloat(saved) : 0.6;
+  });
+  
+  const [notifications, setNotifications] = useState(() => {
+    const saved = localStorage.getItem('softphone-notifications');
+    return saved ? JSON.parse(saved) : true;
+  });
+  
+  const [connectOnStart, setConnectOnStart] = useState(() => {
+    const saved = localStorage.getItem('softphone-connect-on-start');
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  // Functions to save settings (implement localStorage if needed)
+  const saveConnectOnStart = (value) => {
+    setConnectOnStart(value);
+    localStorage.setItem('softphone-connect-on-start', value);
   };
 
-  // Text-to-Speech implementation
-  const speak = (text) => {
-    if (!window.speechSynthesis) return;
-    
-    // Cancel any ongoing speech
-    window.speechSynthesis.cancel();
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = language;
-
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-
-    window.speechSynthesis.speak(utterance);
+  const saveNotifications = (value) => {
+    setNotifications(value);
+    localStorage.setItem('softphone-notifications', value);
   };
 
-  // Stop Text-to-Speech
-  const stopSpeaking = () => {
-    if (window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-      setIsSpeaking(false);
-    }
+  const saveCallVolume = (value) => {
+    setCallVolume(value);
+    localStorage.setItem('softphone-call-volume', value);
   };
 
-  return {
-    isListening,
-    transcript,
-    startListening,
-    stopListening,
-    speak,
-    isSpeaking,
-    stopSpeaking,
+  const saveRingVolume = (value) => {
+    setRingVolume(value);
+    localStorage.setItem('softphone-ring-volume', value);
   };
+
+  return (
+    <div className="App">
+      <header className="App-header">
+        <h1>📞 My Softphone App</h1>
+        <p>Click the button below to open the softphone</p>
+        
+        <button 
+          onClick={() => setSoftPhoneOpen(true)}
+          style={{
+            padding: '12px 24px',
+            fontSize: '16px',
+            backgroundColor: '#1976d2',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            marginBottom: '20px'
+          }}
+        >
+          📞 Open Softphone
+        </button>
+
+        <SoftPhone
+          // Visibility control
+          softPhoneOpen={softPhoneOpen}
+          setSoftPhoneOpen={setSoftPhoneOpen}
+          
+          // Audio settings
+          callVolume={callVolume}
+          ringVolume={ringVolume}
+          
+          // Connection settings
+          connectOnStart={connectOnStart}
+          notifications={notifications}
+          
+          // SIP configuration
+          config={sipConfig}
+          
+          // Settings callbacks
+          setConnectOnStartToLocalStorage={saveConnectOnStart}
+          setNotifications={saveNotifications}
+          setCallVolume={saveCallVolume}
+          setRingVolume={saveRingVolume}
+          
+          // Optional: Built-in floating launcher
+          builtInLauncher={true}
+          launcherPosition="bottom-right"
+          launcherSize="medium"
+          launcherColor="primary"
+          
+          // Optional: Accounts for call transfer
+          asteriskAccounts={[]}
+          
+          // Optional: Timezone for call history
+          timelocale="UTC"
+        />
+      </header>
+    </div>
+  );
 }

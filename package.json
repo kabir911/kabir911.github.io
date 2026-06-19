@@ -15,7 +15,8 @@
     "preact": "^10.29.2",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "react-router-dom": "^7.17.0"
+    "react-router-dom": "^7.17.0",
+    "react-softphone": "^3.1.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.0",
