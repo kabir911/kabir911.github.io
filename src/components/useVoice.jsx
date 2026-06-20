@@ -5,14 +5,25 @@ import {
   useVoiceAssistant,
   RoomAudioRenderer 
 } from '@livekit/components-react';
+import { useLang } from '../i18n/LanguageContext.jsx'; 
 import { useState } from 'react';
 
 export default function UseVoice() {
   const [token, setToken] = useState('');
+  const { t, lang } = useLang()
 
   // 1. Fetch a connection token from your backend when user clicks "Connect"
   const startCall = async () => {
-    const res = await fetch('http://localhost:8082/api/token');
+    const res = await fetch('http://localhost:8082/api/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+       body: JSON.stringify({
+        language: lang,
+        session_id: 'my session'
+      }),
+    });
     const data = await res.json();
     setToken(data.token);
   };
