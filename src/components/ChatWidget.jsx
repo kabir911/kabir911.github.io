@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 // Import the configuration block from your project's shared config file
 import { useLang } from '../i18n/LanguageContext.jsx'
-import { useVoice } from "./useVoice.jsx";
-import { Mic, MicOff, Volume2, VolumeX, Send } from "lucide-react";
 
 export default function ChatWidget() {
   const { t, lang } = useLang()
@@ -150,23 +148,7 @@ export default function ChatWidget() {
     return data.output;    
   };
 
-  const {
-    isListening,
-    transcript,
-    startListening,
-    stopListening,
-    speak,
-    isSpeaking,
-    stopSpeaking,
-  } = useVoice(lang);
-
-   useEffect(() => {
-    if (transcript) {
-      setInput((prev) => prev + " " + transcript);
-    }
-  }, [transcript]);
-
-  const handleSendMessage = async (e) => {
+   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!input.trim() || loading) return;
 
@@ -268,18 +250,7 @@ export default function ChatWidget() {
                   color: msg.role === 'user' ? 'white' : '#333',
                   wordWrap: 'break-word'
                 }}>
-                  {msg.content}
-                  {msg.role !== "user" && (
-                    <button 
-                      onClick={() => {
-                        console.log('speaking');
-                        speak(msg.content)
-                      }} 
-                      style={{ background: "none", border: "none", cursor: "pointer", marginLeft: "5px", padding: 0, zIndex:999 }}
-                    >
-                      <Volume2 size={14} color="#555" />
-                    </button>
-                  )}
+                  {msg.content}                  
                 </div>
               </div>
             ))}
@@ -316,26 +287,7 @@ export default function ChatWidget() {
 
           {/* Input Area */}
           <form onSubmit={handleSendMessage} style={{ padding: '12px', borderTop: '1px solid #eee', display: 'flex', gap: '8px' }}>
-            {isSpeaking && (
-              <button onClick={stopSpeaking} style={{ display: "flex", alignItems: "center", gap: "5px", color: "red", background: "none", border: "none", cursor: "pointer", marginBottom: "5px" }}>
-                <VolumeX size={16} />{t('chat.stopPlayingVoice')}
-              </button>
-            )}
             <div style={{ display: "flex", gap: "5px", width: "100%", alignItems: "center" }}>
-              <button
-                onClick={isListening ? stopListening : startListening}
-                style={{
-                  padding: "8px",
-                  borderRadius: "50%",
-                  border: "none",
-                  backgroundColor: isListening ? "#dc3545" : "#f0f2f5",
-                  color: isListening ? "#fff" : "#000",
-                  cursor: "pointer",
-                }}
-                title={isListening ? t('chat.listeningClickToStop') : t('chat.clickToSpeak')}
-              >
-                {isListening ? <MicOff size={18} /> : <Mic size={18} />}
-              </button>
               <input 
                 type="text"
                 value={input}

@@ -2,16 +2,17 @@ import {
   LiveKitRoom, 
   BarVisualizer, 
   VoiceAssistantControlBar,
-  useVoiceAssistant
+  useVoiceAssistant,
+  RoomAudioRenderer 
 } from '@livekit/components-react';
 import { useState } from 'react';
 
-export function VoiceWidget() {
-  const [token, setToken] = useState<string | null>(null);
+export default function UseVoice() {
+  const [token, setToken] = useState('');
 
   // 1. Fetch a connection token from your backend when user clicks "Connect"
   const startCall = async () => {
-    const res = await fetch('/api/get-livekit-token');
+    const res = await fetch('http://localhost:8082/api/token');
     const data = await res.json();
     setToken(data.token);
   };
@@ -23,12 +24,13 @@ export function VoiceWidget() {
   return (
     // 2. The Room wrapper manages the WebRTC connection automatically
     <LiveKitRoom
-      serverUrl="wss://your-livekit-server.com"
+      serverUrl="ws://localhost:7880"
       token={token}
       connect={true}
       audio={true} // Requests mic access immediately
       video={false}
     >
+      <RoomAudioRenderer /> 
       <div className="elevenlabs-style-widget">
         {/* Animated wave that dances when audio is streaming */}
         <BarVisualizer /> 

@@ -7,6 +7,7 @@ import Impressum from './pages/Impressum.jsx'
 import Privacy from './pages/Privacy.jsx'
 import ChatWidget from './components/ChatWidget';
 import ElevenLabsWidget from './components/ElevenLabsWidget.jsx'
+import UseVoice from './components/UseVoice.jsx'
 
 // Inject avatar chat button styles and animations
 const injectAvatarStyles = () => {
@@ -77,6 +78,7 @@ export default function App() {
       {/*
       <ElevenLabsWidget />
       */}
+      <UseVoice />
       <ChatWidget />
       {isTry && (
         <div>        
