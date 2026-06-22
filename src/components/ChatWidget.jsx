@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 // Import the configuration block from your project's shared config file
 import { useLang } from '../i18n/LanguageContext.jsx'
+import LiveKitVoiceWidget from './LiveKitVoiceWidget.jsx';
 
 export default function ChatWidget() {
   const { t, lang } = useLang()
@@ -10,7 +11,7 @@ export default function ChatWidget() {
   const [loading, setLoading] = useState(false);
   const [provider, setProvider] = useState('gemini'); 
   const [sessionId, setSessionId] = useState('');
-
+  
   const CHAT_CONFIG = JSON.parse(import.meta.env.VITE_CHATCONFIG);
 
     // Track the user-provided Gemini API key
@@ -28,9 +29,7 @@ export default function ChatWidget() {
     if (savedKey) {
       setUserGeminiKey(savedKey);
       setKeyInput(savedKey);
-    }
-    const newSessionId = crypto.randomUUID();
-    setSessionId(newSessionId);
+    }    
   }, []);
 
   useEffect(() => {
@@ -64,6 +63,9 @@ export default function ChatWidget() {
       `;
       document.head.appendChild(styleTag);
     }
+
+    const newSessionId = crypto.randomUUID();
+    setSessionId(newSessionId);
   }, []);
 
   // Handler to save the custom user API key
@@ -89,6 +91,8 @@ export default function ChatWidget() {
     localStorage.removeItem('user_gemini_api_key');
     setUserGeminiKey('');
     setKeyInput('');
+    const newSessionId = crypto.randomUUID();
+    setSessionId(newSessionId);
   };
 
   // Handler to clear chat memory
@@ -99,8 +103,7 @@ export default function ChatWidget() {
   };
 
   // Handler for Local Ollama API and Gemini Calls (Python agent)
-  const callAPI = async (route, chatHistory, userMsg) => {
-    
+  const callAPI = async (route, chatHistory, userMsg) => {    
     const payload = route === 0 ? {
       session_id: sessionId,
       messages: [...chatHistory, userMsg],
@@ -191,7 +194,7 @@ export default function ChatWidget() {
 
       {/* Chat Window Frame */}
       {isOpen && (
-        <div style={{ width: '70vw', height: '480px', backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 5px 25px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid #eee' }}>
+        <div style={{ width: '70vw', height: '80vh', backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 5px 25px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid #eee' }}>
           
           {/* Header Bar */}
           <div style={{ backgroundColor: '#007bff', color: 'white', padding: '10px 15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -307,6 +310,8 @@ export default function ChatWidget() {
               </button>
             </div>
           </form>
+
+          <LiveKitVoiceWidget sessionId={sessionId} setMessages={setMessages} setLoading={setLoading}/>
         </div>
       )}
     </div>
