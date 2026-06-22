@@ -48,8 +48,9 @@
     "listeningClickToStop": "Listening... click to stop",
     "clickToSpeak": "Click to speak",
     "callAgent": "Call the Agent",
-    "agentListening": "Agent listening",    
-    "callingAgent": "Speaking with Agent",
+    "agentListening": "Agent ready",    
+    "connectingAgent": "Connecting with Agent",
+    "speaking": "Speaking with Agent",
     "connecting": "Connecting",
     "hangup": "Hang Up"
   },

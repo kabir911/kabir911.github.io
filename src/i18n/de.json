@@ -48,8 +48,9 @@
     "listeningClickToStop": "Zuhören... klicken, um zu stoppen",
     "clickToSpeak": "Klicken Sie, um zu sprechen",
     "callAgent": "Rufen Sie den Agenten an",
-    "agentListening": "Agent hört zu",
-    "callingAgent": "Gespräch mit Agent",
+    "agentListening": "Agent bereit",
+    "connectingAgent": "Verbindung mit Agent herstellen",
+    "speaking": "Gespräch mit Agent",
     "connecting": "Verbinden",
     "hangup": "Auflegen"
   },

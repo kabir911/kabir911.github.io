@@ -7,7 +7,7 @@ import {
   TrackToggle,
   useRoomContext,
   StartAudio,
-  BarVisualizer,
+  BarVisualizer  
 } from '@livekit/components-react';
 import { Track, RoomEvent } from 'livekit-client';
 import '@livekit/components-styles';
@@ -18,6 +18,7 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
   // console.log('sessionId:', sessionId, 'setMessages:', setMessages);
   const [connectionDetails, setConnectionDetails] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [handedOff, setHandedOff] = useState(false);
   const { t, lang } = useLang()
 
   const AgentVisualizerRow = () => {
@@ -27,9 +28,9 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
     return (
       <div className="lk-voice-visualizer-row">
         <span className="lk-voice-status-text">
-          {agentTrack ? t('chat.agentListening') : t('chat.callingAgent') + "..."}
+          {(agentTrack ? (handedOff ? t('chat.agentListening') : t('chat.connectingAgent')) : t('chat.connectingAgent')) + "..."}
         </span>
-        {agentTrack?.publication?.track ? (
+        {handedOff && agentTrack?.publication?.track ? (
           <BarVisualizer 
             track={agentTrack.publication.track} 
             barCount={9}
@@ -94,6 +95,9 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
       if (room) {
         await room.disconnect(); // Gracefully drops WebRTC connection [1]
       }
+      setLoading(false);
+      setConnectionDetails(null);
+      setHandedOff(false);
     };
 
     return (
@@ -134,10 +138,11 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
             console.log("Agent Event:", jsonString);
 
             if (parsedData.type === 'agent_handoff') {
+              setHandedOff(true);
               setLoading(true);
-            } else {
-              setLoading(false);
+            } else {              
               setMessages((prev) => [...prev, { role: parsedData.role, content: parsedData.content.join('') }]);
+              setLoading(parsedData.role === 'user' ? true : false);
             }
           } catch (error) {
             console.error("Failed to parse incoming data packet:", error);
@@ -175,10 +180,12 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
 
         <div className="lk-voice-panel-body">          
           <AgentVisualizerRow />
-          <VoiceAssistantControlBar controls={{ leave: true, mic: true }} />
+          {handedOff && (  
+            <VoiceAssistantControlBar controls={{ leave: true, mic: true }} />            
+          )}
           <HangUpButton />
           <VoiceboxChatReceiver />
-        </div>
+        </div>        
       </LiveKitRoom>
     </div>
   );
