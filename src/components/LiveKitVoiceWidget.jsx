@@ -238,10 +238,10 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
           
           <div className="lk-custom-control-bar">
             <HangUpButton />
-            {handedOff && (
-              <div>
+            {handedOff && (              
               <TrackToggle source={Track.Source.Microphone} className="lk-custom-toggle-btn" />
-            
+            )}
+            {handedOff && (              
               <div className="lk-settings-menu-container">
                 <button 
                   className={`lk-custom-settings-btn ${showSettings ? 'active' : ''}`}
@@ -264,8 +264,7 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
                     <DirectDeviceManager />
                   </div>
                 )}
-              </div>
-              </div>
+              </div>              
             )}
           </div>
 
