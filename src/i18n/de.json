@@ -46,7 +46,13 @@
     "editGeminiKey": "Gemini API-Schlüssel bearbeiten",
     "stopPlayingVoice": "Hören Sie auf, die Stimme zu spielen",
     "listeningClickToStop": "Zuhören... klicken, um zu stoppen",
-    "clickToSpeak": "Klicken Sie, um zu sprechen"
+    "clickToSpeak": "Klicken Sie, um zu sprechen",
+    "callAgent": "Rufen Sie den Agenten an",
+    "agentListening": "Agent bereit",
+    "connectingAgent": "Verbindung mit Agent herstellen",
+    "speaking": "Gespräch mit Agent",
+    "connecting": "Verbinden",
+    "hangup": "Auflegen"
   },
   "about": {
     "eyebrow": "Mit wem Sie arbeiten",

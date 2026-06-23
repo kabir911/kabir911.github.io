@@ -7,6 +7,7 @@ import Impressum from './pages/Impressum.jsx'
 import Privacy from './pages/Privacy.jsx'
 import ChatWidget from './components/ChatWidget';
 import ElevenLabsWidget from './components/ElevenLabsWidget.jsx'
+import UseVoice from './components/LiveKitVoiceWidget.jsx'
 
 // Inject avatar chat button styles and animations
 const injectAvatarStyles = () => {
@@ -58,7 +59,7 @@ export default function App() {
   
   // Inject avatar chat button styles on mount
   useEffect(() => {
-    injectAvatarStyles();
+    injectAvatarStyles();        
   }, []);
   
    return (
@@ -77,7 +78,7 @@ export default function App() {
       {/*
       <ElevenLabsWidget />
       */}
-      <ChatWidget />
+      <ChatWidget/>
       {isTry && (
         <div>        
         <button 

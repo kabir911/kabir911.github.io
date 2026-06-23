@@ -46,7 +46,13 @@
     "editGeminiKey": "Edit Gemini API Key",
     "stopPlayingVoice": "Stop playing voice",
     "listeningClickToStop": "Listening... click to stop",
-    "clickToSpeak": "Click to speak"
+    "clickToSpeak": "Click to speak",
+    "callAgent": "Call the Agent",
+    "agentListening": "Agent ready",    
+    "connectingAgent": "Connecting with Agent",
+    "speaking": "Speaking with Agent",
+    "connecting": "Connecting",
+    "hangup": "Hang Up"
   },
   "about": {
     "eyebrow": "Who you work with",

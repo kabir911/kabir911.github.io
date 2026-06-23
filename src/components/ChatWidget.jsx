@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 // Import the configuration block from your project's shared config file
 import { useLang } from '../i18n/LanguageContext.jsx'
-import { useVoice } from "./useVoice.jsx";
-import { Mic, MicOff, Volume2, VolumeX, Send } from "lucide-react";
+import LiveKitVoiceWidget from './LiveKitVoiceWidget.jsx';
 
 export default function ChatWidget() {
   const { t, lang } = useLang()
@@ -12,7 +11,7 @@ export default function ChatWidget() {
   const [loading, setLoading] = useState(false);
   const [provider, setProvider] = useState('gemini'); 
   const [sessionId, setSessionId] = useState('');
-
+  
   const CHAT_CONFIG = JSON.parse(import.meta.env.VITE_CHATCONFIG);
 
     // Track the user-provided Gemini API key
@@ -30,9 +29,7 @@ export default function ChatWidget() {
     if (savedKey) {
       setUserGeminiKey(savedKey);
       setKeyInput(savedKey);
-    }
-    const newSessionId = crypto.randomUUID();
-    setSessionId(newSessionId);
+    }    
   }, []);
 
   useEffect(() => {
@@ -66,6 +63,9 @@ export default function ChatWidget() {
       `;
       document.head.appendChild(styleTag);
     }
+
+    const newSessionId = crypto.randomUUID();
+    setSessionId(newSessionId);
   }, []);
 
   // Handler to save the custom user API key
@@ -91,6 +91,8 @@ export default function ChatWidget() {
     localStorage.removeItem('user_gemini_api_key');
     setUserGeminiKey('');
     setKeyInput('');
+    const newSessionId = crypto.randomUUID();
+    setSessionId(newSessionId);
   };
 
   // Handler to clear chat memory
@@ -101,8 +103,7 @@ export default function ChatWidget() {
   };
 
   // Handler for Local Ollama API and Gemini Calls (Python agent)
-  const callAPI = async (route, chatHistory, userMsg) => {
-    
+  const callAPI = async (route, chatHistory, userMsg) => {    
     const payload = route === 0 ? {
       session_id: sessionId,
       messages: [...chatHistory, userMsg],
@@ -150,23 +151,7 @@ export default function ChatWidget() {
     return data.output;    
   };
 
-  const {
-    isListening,
-    transcript,
-    startListening,
-    stopListening,
-    speak,
-    isSpeaking,
-    stopSpeaking,
-  } = useVoice(lang);
-
-   useEffect(() => {
-    if (transcript) {
-      setInput((prev) => prev + " " + transcript);
-    }
-  }, [transcript]);
-
-  const handleSendMessage = async (e) => {
+   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!input.trim() || loading) return;
 
@@ -209,7 +194,7 @@ export default function ChatWidget() {
 
       {/* Chat Window Frame */}
       {isOpen && (
-        <div style={{ width: '70vw', height: '480px', backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 5px 25px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid #eee' }}>
+        <div style={{ width: '70vw', height: '80vh', backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 5px 25px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid #eee' }}>
           
           {/* Header Bar */}
           <div style={{ backgroundColor: '#007bff', color: 'white', padding: '10px 15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -268,18 +253,7 @@ export default function ChatWidget() {
                   color: msg.role === 'user' ? 'white' : '#333',
                   wordWrap: 'break-word'
                 }}>
-                  {msg.content}
-                  {msg.role !== "user" && (
-                    <button 
-                      onClick={() => {
-                        console.log('speaking');
-                        speak(msg.content)
-                      }} 
-                      style={{ background: "none", border: "none", cursor: "pointer", marginLeft: "5px", padding: 0, zIndex:999 }}
-                    >
-                      <Volume2 size={14} color="#555" />
-                    </button>
-                  )}
+                  {msg.content}                  
                 </div>
               </div>
             ))}
@@ -316,26 +290,7 @@ export default function ChatWidget() {
 
           {/* Input Area */}
           <form onSubmit={handleSendMessage} style={{ padding: '12px', borderTop: '1px solid #eee', display: 'flex', gap: '8px' }}>
-            {isSpeaking && (
-              <button onClick={stopSpeaking} style={{ display: "flex", alignItems: "center", gap: "5px", color: "red", background: "none", border: "none", cursor: "pointer", marginBottom: "5px" }}>
-                <VolumeX size={16} />{t('chat.stopPlayingVoice')}
-              </button>
-            )}
             <div style={{ display: "flex", gap: "5px", width: "100%", alignItems: "center" }}>
-              <button
-                onClick={isListening ? stopListening : startListening}
-                style={{
-                  padding: "8px",
-                  borderRadius: "50%",
-                  border: "none",
-                  backgroundColor: isListening ? "#dc3545" : "#f0f2f5",
-                  color: isListening ? "#fff" : "#000",
-                  cursor: "pointer",
-                }}
-                title={isListening ? t('chat.listeningClickToStop') : t('chat.clickToSpeak')}
-              >
-                {isListening ? <MicOff size={18} /> : <Mic size={18} />}
-              </button>
               <input 
                 type="text"
                 value={input}
@@ -355,6 +310,8 @@ export default function ChatWidget() {
               </button>
             </div>
           </form>
+
+          <LiveKitVoiceWidget sessionId={sessionId} setMessages={setMessages} setLoading={setLoading}/>
         </div>
       )}
     </div>
