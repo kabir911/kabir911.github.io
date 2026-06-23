@@ -58,7 +58,7 @@
 
 /* 2. Expanded Active State Widget Layout */
 .lk-voice-active-panel {
-  background: #1e1b4b; /* Deep premium voice color */
+  background: #d6d6d8; /* Deep premium voice color */
   border: 1px solid rgba(124, 58, 237, 0.3);
   padding: 12px;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
@@ -66,175 +66,174 @@
   min-width: 70vw !important;
 }
 
+/* Container Panel Fixes */
 .lk-voice-panel-body {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  width: 100%;
+  gap: 16px;
+  padding: 16px;
+  background: #e7e7eb !important;
+  border-radius: 12px;
+  border: 1px solid #2d2d39;
 }
 
-.lk-voice-visualizer-row {
+/* Control Row Elements */
+.lk-custom-control-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 8px 12px;
-  border-radius: 8px;
-  height: 28px;
-}
-
-.lk-voice-status-text {
-  font-size: 13px;
-  color: #c084fc;
-  font-weight: 500;
-}
-
-.lk-voice-bars {
-  height: 20px !important;
-  width: 60px !important;
-  --lk-va-bar-color: #a855f7 !important;
-}
-
-/* 2. Expanded Active State Widget Layout */
-.lk-voice-active-panel {
-  background: #1e1b4b; /* Deep premium voice color */
-  border: 1px solid rgba(124, 58, 237, 0.3);
-  padding: 14px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-  width: 100%; /* Forces widget to fill chat footprint */
-  box-sizing: border-box;
-}
-
-.lk-voice-panel-body {
-  display: flex;
-  flex-direction: column;
-  gap: 16px; /* Increased separation between the row and the buttons */
-  width: 100%;
-}
-
-/* Row takes full width and spaces out status text vs audio bars */
-.lk-voice-visualizer-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* Pushes text to left, bars to right */
-  background: rgba(255, 255, 255, 0.05);
-  padding: 10px 14px;
-  border-radius: 8px;
-  height: 32px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.lk-voice-status-text {
-  font-size: 13px;
-  color: #c084fc;
-  font-weight: 500;
-}
-
-/* Expanded audio bar width to stop them from feeling cramped */
-.lk-voice-bars {
-  height: 24px !important;
-  width: 100px !important; /* Widen the visualizer spectrum */
-  --lk-va-bar-color: #a855f7 !important;
-}
-
-/* Overriding LiveKit control bar to stretch buttons full width */
-.lk-voice-active-panel .lk-voice-assistant-control-bar {
-  border: none !important;
-  background: transparent !important;
-  padding: 0 !important;
-  display: flex !important;
-  justify-content: space-between !important; /* Spreads mic button and disconnect button apart */
-  align-items: center !important;
-  width: 100% !important;
-}
-
-/* Style the custom button housings so they have breathing room */
-.lk-voice-active-panel .lk-button {
-  background: rgba(255, 255, 255, 0.1) !important;
-  color: white !important;
-  border-radius: 30px !important; /* Morphed from tiny circle into premium capsule button */
-  flex: 1 !important; /* Tells buttons to share width equally */
-  height: 40px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 10px;
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  transition: background 0.2s ease !important;
-}
-
-/* Add a margin between the two action buttons so they don't touch */
-.lk-voice-active-panel .lk-button:first-child {
-  margin-right: 12px;
-}
-
-.lk-voice-active-panel .lk-button:hover {
-  background: rgba(255, 255, 255, 0.18) !important;
-}
-
-.lk-voice-active-panel .lk-button-disconnect {
-  background: #ef4444 !important;
-}
-.lk-voice-active-panel .lk-button-disconnect:hover {
-  background: #dc2626 !important;
-}
-
-/* Layout row containing the action buttons */
-.lk-voice-custom-controls {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  width: 100% !important;
   gap: 12px;
+  justify-content: center;
 }
 
-/* Base button parameters for layout mapping */
-.lk-custom-mute-btn,
-.lk-custom-hangup-btn {
-  all: unset;
-  box-sizing: border-box;
-  flex: 1 !important; /* Forces buttons to share container width evenly */
-  height: 40px;
-  display: inline-flex;
+/* Base Settings Trigger button formatting */
+.lk-custom-settings-btn {
+  background: #2a2a36;
+  border: 1px solid #444456;
+  color: #ffffff !important;
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  font-family: system-ui, -apple-system, sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s ease, transform 0.1s ease;
+  transition: all 0.2s ease;
 }
 
-/* Mic toggle button styling override */
-.lk-custom-mute-btn {
-  background: rgba(255, 255, 255, 0.1) !important;
+.lk-custom-settings-btn:hover,
+.lk-custom-settings-btn.active {
+  background: #3e3e50;
+  border-color: #61617d;
   color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.05) !important;
-}
-.lk-custom-mute-btn:hover {
-  background: rgba(255, 255, 255, 0.18) !important;
 }
 
-/* Dedicated hangup styles */
-.lk-custom-hangup-btn {
-  background: #ef4444;
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
-}
-.lk-custom-hangup-btn:hover {
-  background: #dc2626;
-}
-.lk-custom-hangup-btn:active {
-  transform: scale(0.98);
+.lk-settings-icon {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
 }
 
-.lk-hangup-icon {
-  width: 16px;
-  height: 16px;
-  transform: rotate(135deg); /* Flips phone icon into horizontal hangup position */
+/* Floating Multi-Device Box Styles */
+.lk-floating-device-menu {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff !important;
+  border: 1px solid #dcdce6;
+  box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  width: 300px; /* Slightly wider to give room for text labels */
+  padding: 14px;
+  z-index: 9999;
+  animation: slideUpFade 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.lk-floating-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #e1e1eb;
+  padding-bottom: 8px;
+}
+
+.lk-floating-menu-header h4 {
+  margin: 0;
+  color: #1a1a24 !important;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.lk-close-menu-btn {
+  background: transparent;
+  border: none;
+  color: #707080;
+  font-size: 22px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+
+/* Section Groupings */
+.lk-device-manager-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lk-device-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lk-section-title {
+  margin: 0;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #707080 !important;
+  font-weight: 700;
+}
+
+/* Container holding the flat buttons layout */
+.lk-custom-direct-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 120px; /* Keeps lists compact when stacked together */
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+/* Direct Item styling */
+.lk-custom-device-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: #2d2d3d !important;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.lk-custom-device-item:hover {
+  background: #f1f1f8 !important;
+  color: #000000 !important;
+}
+
+/* Informational / Incompatible alerts formatting */
+.lk-no-devices,
+.lk-browser-warning {
+  color: #8c8c9e;
+  font-size: 12px;
+  padding: 8px;
+  background: #f5f5fa;
+  border-radius: 6px;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.lk-browser-warning {
+  color: #b54708;
+  background: #fffaeb;
+  border: 1px solid #fedf89;
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
