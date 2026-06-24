@@ -21,7 +21,7 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
   const [isLoading, setIsLoading] = useState(false);
   const [handedOff, setHandedOff] = useState(false);
   const [showSettings, setShowSettings] = useState(false); 
-  const [agentState, setAgentState] = useState('unknown');
+  const [agentState, setAgentState] = useState(t('initializing'));
   const [agentName, setAgentName] = useState('');
   const { t, lang } = useLang();
   const [toast, setToast] = useState({ message: '', type: 'success' });
