@@ -52,7 +52,16 @@
     "connectingAgent": "Verbindung mit Agent herstellen",
     "speaking": "Gespräch mit Agent",
     "connecting": "Verbinden",
-    "hangup": "Auflegen"
+    "hangup": "Auflegen",
+    "devices": "Geräte",
+    "defaultSpeaker": "Standardlautsprecher",
+    "noMicrophone": "Kein Mikrofon gefunden",
+    "microphoneInput": "Mikrofoneingang",
+    "speakerOutput": "Lautsprecherausgang",
+    "notSupported": "Wird von Ihrem aktuellen Browser nicht unterstützt. (Chrome/Edge verwenden)",
+    "deviceSwitched": "Gerät gewechselt",
+    "unknownMicrophone": "Unbekanntes Mikrofon",
+    "unknownSpeaker": "Unbekannter Sprecher"
   },
   "about": {
     "eyebrow": "Mit wem Sie arbeiten",

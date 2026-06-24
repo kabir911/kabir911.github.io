@@ -128,7 +128,7 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
         try {
           console.log('switch', kind, deviceId);
           await room.switchActiveDevice(kind, deviceId);
-          showToast("Device switched", "success")          
+          showToast(t('chat.deviceSwitched'), "success")          
         } catch (e) {
           showToast(e.message, "warning")
         }
@@ -139,10 +139,10 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
       <div className="lk-device-manager-wrapper">
         {/* Microphones Section */}
         <div className="lk-device-section">
-          <h5 className="lk-section-title">Microphone Input</h5>
+          <h5 className="lk-section-title">{t('chat.microphoneInput')}</h5>
           <div className="lk-custom-direct-list">
             {microphones.length === 0 ? (
-              <div className="lk-no-devices">No microphones found</div>
+              <div className="lk-no-devices">{t('chat.noMicrophone')}</div>
             ) : (
               microphones.map((device) => (
                 <button
@@ -151,7 +151,7 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
                   onClick={() => handleDeviceSelect('audioinput', device.deviceId)}
                   title={device.label}
                 >
-                  <span className="lk-device-text-label">{device.label || 'Unknown Microphone'}</span>
+                  <span className="lk-device-text-label">{device.label || t('chat.unknownMicrophone')}</span>
                 </button>
               ))
             )}
@@ -160,15 +160,15 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
 
         {/* Speakers Section */}
         <div className="lk-device-section">
-          <h5 className="lk-section-title">Speaker Output</h5>
+          <h5 className="lk-section-title">{t('chat.speakerOutput')}</h5>
           {!supportsSpeakerSwitch && (
             <div className="lk-browser-warning">
-              Not supported by your current browser. (Use Chrome/Edge)
+              {t('chat.notSupported')}
             </div>
           )} 
           
           {supportsSpeakerSwitch && speakers.length === 0 && (
-            <div className="lk-no-devices">System Default Speaker</div>
+            <div className="lk-no-devices">{t('chat.defaultSpeaker')}</div>
           )}
           
           {supportsSpeakerSwitch && speakers.length > 0 && (
@@ -180,7 +180,7 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
                   onClick={() => handleDeviceSelect('audiooutput', device.deviceId)}
                   title={device.label}
                 >
-                  <span className="lk-device-text-label">{device.label || 'Unknown Speaker'}</span>
+                  <span className="lk-device-text-label">{device.label || t('chat.unknownSpeaker')}</span>
                 </button>
               ))}
             </div>          
@@ -258,7 +258,7 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
                 {showSettings && (
                   <div className="lk-floating-device-menu">
                     <div className="lk-floating-menu-header">
-                      <h4>Devices</h4>
+                      <h4>{t('devices')}</h4>
                       <button onClick={() => setShowSettings(false)} className="lk-close-menu-btn">×</button>
                     </div>
                     <DirectDeviceManager />
