@@ -14,12 +14,15 @@ import '@livekit/components-styles';
 import './LiveKitVoiceWidget.css'; 
 import { useLang } from '../i18n/LanguageContext.jsx';
 import Toast from './Toast';
+import Status from './Status.jsx';
 
 export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading}) {
   const [connectionDetails, setConnectionDetails] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [handedOff, setHandedOff] = useState(false);
   const [showSettings, setShowSettings] = useState(false); 
+  const [agentState, setAgentState] = useState('unknown');
+  const [agentName, setAgentName] = useState('');
   const { t, lang } = useLang();
   const [toast, setToast] = useState({ message: '', type: 'success' });
   let toastTimer = null;
@@ -41,11 +44,25 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
     const tracks = useTracks([{ source: Track.Source.Microphone, updateOnly: true }]);
     const agentTrack = tracks.find((t) => t.participant.isAgent);
 
+    if (agentTrack && handedOff) {
+      const room = useRoomContext();
+        room.on(RoomEvent.ParticipantAttributesChanged, (changedAttributes, participant) => {
+          // Check if the changed attribute belongs to the agent
+          if (participant.identity === agentName) {
+              const agentState = participant.attributes['lk.agent.state'];
+              console.log("Native Agent State updated to:", agentState);
+              // Output can be: "initializing", "idle", "listening", "thinking", "speaking"
+              setAgentState(agentState);              
+          }
+      });
+    }
+
     return (
       <div className="lk-voice-visualizer-row">
-        <span className="lk-voice-status-text">
-          {(agentTrack ? (handedOff ? t('chat.agentListening') : t('chat.connectingAgent')) : t('chat.connectingAgent')) + "..."}
-        </span>
+        <div className="lk-voice-status-text">
+          <div className="flex-1 min-w-0">{(agentTrack ? (handedOff ? t('chat.agentListening') : t('chat.connectingAgent')) : t('chat.connectingAgent')) + "..."}</div>
+          <Status status={(t('chat.' + agentState))}/>
+        </div>
         {handedOff && agentTrack?.publication?.track ? (  
           <BarVisualizer 
             track={agentTrack.publication.track} 
@@ -85,10 +102,12 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
         className={`lk-voice-embed-btn ${isLoading ? 'loading' : ''}`}
         disabled={isLoading}
       >
-        <div className="lk-voice-pulse-ring"></div>
-        <svg className="lk-voice-mic-icon" xmlns="http://w3.org" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
-        </svg>
+        <div className="lk-voice-mic-container">
+          <div className="lk-voice-pulse-ring"></div>
+          <svg className="lk-voice-mic-icon" xmlns="http://w3.org" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
+          </svg>
+        </div>        
         <span>{isLoading ? t('chat.connecting') : t('chat.callAgent')}</span>
       </button>
     );
@@ -96,6 +115,16 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
   
   const HangUpButton = () => {
     const room = useRoomContext();
+    
+    room.on(RoomEvent.ParticipantConnected, (participant) => {
+        if (participant.identity && participant.identity.startsWith("agent-")) {
+          console.log("Agent identity discovered:", participant.identity);
+          setAgentName(participant.identity);
+        } else {
+          console.log('Participant event:', participant);
+        }
+    });
+
     const handleDisconnect = async () => {
       if (room) { await room.disconnect(); }
       setLoading(false);
@@ -203,9 +232,11 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
             if (parsedData.type === 'agent_handoff') {
               setHandedOff(true);
               setLoading(true);
-            } else {              
+            } else if (parsedData.type === 'message') {
               setMessages((prev) => [...prev, { role: parsedData.role, content: parsedData.content.join('') }]);
               setLoading(parsedData.role === 'user' ? true : false);
+            } else {
+              console.log('Unknown:', parsedData);              
             }
           } catch (error) {
             console.error("Failed to parse incoming data packet:", error);

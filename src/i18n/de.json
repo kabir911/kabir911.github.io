@@ -50,7 +50,7 @@
     "callAgent": "Rufen Sie den Agenten an",
     "agentListening": "Agent bereit",
     "connectingAgent": "Verbindung mit Agent herstellen",
-    "speaking": "Gespräch mit Agent",
+    "speakingAgent": "Gespräch mit Agent",
     "connecting": "Verbinden",
     "hangup": "Auflegen",
     "devices": "Geräte",
@@ -61,7 +61,14 @@
     "notSupported": "Wird von Ihrem aktuellen Browser nicht unterstützt. (Chrome/Edge verwenden)",
     "deviceSwitched": "Gerät gewechselt",
     "unknownMicrophone": "Unbekanntes Mikrofon",
-    "unknownSpeaker": "Unbekannter Sprecher"
+    "unknownSpeaker": "Unbekannter Sprecher",
+    "unknown": "Unbekannt",
+    "speaking": "Apropos",
+    "listening": "Hören",
+    "thinking": "Denken",
+    "status": "Status",
+    "initializing": "Initialisierung",
+    "idle": "Leerlauf"
   },
   "about": {
     "eyebrow": "Mit wem Sie arbeiten",
