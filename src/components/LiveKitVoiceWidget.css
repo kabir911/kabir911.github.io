@@ -26,6 +26,36 @@
   transition: all 0.25s ease;
 }
 
+/* 1. Force the parent visualizer container to have a true structural height */
+.lk-audio-bar-visualizer {
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  height: 40px !important;    /* 👈 CRITICAL: Gives the % heights a base canvas */
+  min-height: 40px !important;
+  gap: 4px !important;        /* Explicit spacing between bars */
+  width: auto;
+}
+
+/* 2. Force the internal bar nodes to have actual horizontal thickness and physical layout */
+.lk-audio-bar-visualizer > span,
+.lk-audio-bar-visualizer .lk-audio-bar {
+  display: inline-block !important; /* Forces the span to respect the height */
+  width: 6px !important;            /* Gives each bar horizontal weight */
+  border-radius: 9999px !important; /* Gives them clean pill corners */
+  transform-origin: bottom !important;
+  
+  /* Fallback color if background is light (Silent state) */
+  background-color: #cbd5e1 !important; /* Soft gray */
+  opacity: 1 !important;
+}
+
+/* 3. Force the color to update instantly when LiveKit flags it as active */
+.lk-audio-bar-visualizer > [data-lk-highlighted="true"],
+.lk-audio-bar-visualizer .lk-audio-bar.lk-highlighted {
+  background-color: #3b82f6 !important; /* 👈 Bright Blue when you speak */
+}
+
 .lk-voice-embed-btn:hover:not(:disabled) {
   background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
   transform: translateY(-1px);
@@ -121,6 +151,13 @@
 .lk-voice-status-text {
   display: flex;
   justify-content: space-between;   
+  flex-wrap: nowrap;
+  align-items: center;   
+}
+
+.lk-voice-bar-layout {
+  display: flex;
+  justify-content: space-around;   
   flex-wrap: nowrap;
   align-items: center;   
 }

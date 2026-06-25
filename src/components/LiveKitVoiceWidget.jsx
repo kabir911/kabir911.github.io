@@ -8,6 +8,8 @@ import {
   StartAudio,
   BarVisualizer,
   useMediaDevices, // Swapped for direct lists to completely remove nested dropdowns
+  useVoiceAssistant,
+  useLocalParticipant
 } from '@livekit/components-react';
 import { Track, RoomEvent } from 'livekit-client';
 import '@livekit/components-styles';
@@ -21,8 +23,9 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
   const [isLoading, setIsLoading] = useState(false);
   const [handedOff, setHandedOff] = useState(false);
   const [showSettings, setShowSettings] = useState(false); 
-  const [agentState, setAgentState] = useState(t('initializing'));
+  const [agentState, setAgentState] = useState('initializing');
   const [agentName, setAgentName] = useState('');
+
   const { t, lang } = useLang();
   const [toast, setToast] = useState({ message: '', type: 'success' });
   let toastTimer = null;
@@ -41,18 +44,25 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
   };
 
   const AgentVisualizerRow = () => {
-    const tracks = useTracks([{ source: Track.Source.Microphone, updateOnly: true }]);
-    const agentTrack = tracks.find((t) => t.participant.isAgent);
+    // const tracks = useTracks([{ source: Track.Source.Microphone, updateOnly: true }]);
+    // const agentTrack = tracks.find((t) => t.participant.isAgent);
 
-    if (agentTrack && handedOff) {
+    const { audioTrack } = useVoiceAssistant();
+    
+    const localParticipant = useLocalParticipant();
+    // console.log('localParticipant:', localParticipant)
+    const { microphoneTrack } = localParticipant;                   
+    
+    if (handedOff) {
       const room = useRoomContext();
         room.on(RoomEvent.ParticipantAttributesChanged, (changedAttributes, participant) => {
           // Check if the changed attribute belongs to the agent
           if (participant.identity === agentName) {
               const agentState = participant.attributes['lk.agent.state'];
-              console.log("Native Agent State updated to:", agentState);
+              // console.log("Native Agent State updated to:", agentState);
               // Output can be: "initializing", "idle", "listening", "thinking", "speaking"
-              setAgentState(agentState);              
+              setAgentState(agentState);
+              // console.log('agent-state:', agentState);              
           }
       });
     }
@@ -60,19 +70,27 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
     return (
       <div className="lk-voice-visualizer-row">
         <div className="lk-voice-status-text">
-          <div className="flex-1 min-w-0">{(agentTrack ? (handedOff ? t('chat.agentListening') : t('chat.connectingAgent')) : t('chat.connectingAgent')) + "..."}</div>
+          <div className="flex-1 min-w-0">{handedOff ? t('chat.agentListening') : t('chat.connectingAgent') + "..."}</div>
           <Status status={(t('chat.' + agentState))}/>
         </div>
-        {handedOff && agentTrack?.publication?.track ? (  
-          <BarVisualizer 
-            track={agentTrack.publication.track} 
-            barCount={9}            
-            options={{ gap: 4 }}
-            className="lk-voice-bars"
-          />
-        ) : (
-          <div className="lk-voice-loading-dots"><span></span><span></span><span></span></div>
-        )}
+        <div className="lk-voice-bar-layout">
+          {handedOff && microphoneTrack?.track && (
+            <BarVisualizer           
+              track={microphoneTrack.track} 
+              barCount={9}            
+              options={{ gap: 4}}
+              className="lk-voice-bars"            
+            />
+          )}
+          {handedOff && audioTrack && (  
+            <BarVisualizer           
+              track={audioTrack} 
+              barCount={9}            
+              options={{ gap: 4}}
+              className="lk-voice-bars"            
+            />
+          )}        
+        </div>
       </div>
     );
   };
@@ -126,6 +144,7 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
     });
 
     const handleDisconnect = async () => {
+      console.log('disconnecting');
       if (room) { await room.disconnect(); }
       setLoading(false);
       setConnectionDetails(null);
