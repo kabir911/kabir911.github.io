@@ -291,7 +291,7 @@ export default function ChatWidget() {
           {/* Input Area */}
           <form onSubmit={handleSendMessage} style={{ padding: '12px', borderTop: '1px solid #eee', display: 'flex', gap: '8px' }}>
             <div style={{ display: "flex", gap: "5px", width: "100%", alignItems: "center" }}>
-              <input 
+              <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}

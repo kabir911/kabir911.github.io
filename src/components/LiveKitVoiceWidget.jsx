@@ -268,7 +268,7 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
 
     return null;
   };
-
+  
   return (
     <div className="lk-voice-active-panel">
       <LiveKitRoom
