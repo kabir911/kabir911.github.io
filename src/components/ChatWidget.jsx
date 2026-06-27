@@ -38,6 +38,17 @@ export default function ChatWidget() {
     }
   }, [messages, loading]); // Added loading dependency to scroll when dots appear
 
+  const setASession = () => {
+        const existingSessionId = localStorage.getItem('sessionId');
+    if (!existingSessionId) {
+      const newSessionId = crypto.randomUUID();
+      setSessionId(newSessionId);
+      localStorage.setItem('sessionId', newSessionId);
+    } else {
+      setSessionId(existingSessionId);
+      console.log('existingSession:', existingSessionId);
+    }
+  }
   // Inject pulsing animation keyframes directly into the document head
   useEffect(() => {
     const styleId = "chat-typing-animation-styles";
@@ -64,15 +75,7 @@ export default function ChatWidget() {
       document.head.appendChild(styleTag);
     }
 
-    const existingSessionId = localStorage.getItem('sessionId');
-    if (!existingSessionId) {
-      const newSessionId = crypto.randomUUID();
-      setSessionId(newSessionId);
-      localStorage.setItem('sessionId', newSessionId);
-    } else {
-      setSessionId(existingSessionId);
-      console.log('existingSession:', existingSessionId);
-    }
+    setASession();
   }, []);
 
   // Handler to save the custom user API key
@@ -98,14 +101,16 @@ export default function ChatWidget() {
     localStorage.removeItem('user_gemini_api_key');
     setUserGeminiKey('');
     setKeyInput('');
-    const newSessionId = crypto.randomUUID();
-    setSessionId(newSessionId);
+    setASession();
   };
 
   // Handler to clear chat memory
   const handleClearChat = () => {
     if (window.confirm(t("chat.clear"))) {
       setMessages([]);
+      localStorage.removeItem('liveKitToken');
+      localStorage.removeItem('sessionId');
+      setASession();
     }
   };
 

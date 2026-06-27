@@ -52,6 +52,7 @@
     "connectingAgent": "Verbindung mit Agent herstellen",
     "speakingAgent": "Gespräch mit Agent",
     "connecting": "Verbinden",
+    "disconnected": "Getrennt",
     "hangup": "Auflegen",
     "devices": "Geräte",
     "defaultSpeaker": "Standardlautsprecher",

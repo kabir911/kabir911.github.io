@@ -97,7 +97,7 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
           <Status state={liveKitAgentState} />
         </div>
         <div className="lk-voice-bar-layout">
-          {handedOff && microphoneTrack?.track && (
+          {microphoneTrack?.track && (
             <BarVisualizer           
               track={microphoneTrack.track} 
               barCount={9}            
@@ -105,7 +105,7 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
               className="lk-voice-bars"            
             />
           )}
-          {handedOff && audioTrack && (  
+          {audioTrack && (  
             <BarVisualizer           
               track={audioTrack} 
               barCount={9}            
@@ -119,7 +119,7 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
   };  
 
   const startConversation = async () => {
-    const existingToken = localStorage.getItem('liveKitToken');
+    const existingToken = localStorage.getItem('liveKitToken');    
     if (!existingToken || !isValidToken(existingToken)) {
       setIsLoading(true);    
       const payload = { language: lang, session_id: sessionId, room: "agent-room" };
@@ -133,6 +133,7 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
         setToken(data.token);
         localStorage.setItem('liveKitToken', data.token);
         setConnectionDetails({ url: import.meta.env.VITE_LIVEKIT_SERVER_URL, token: data.token });
+        console.log('newToken:', data.token);
       } catch (error) {
         console.error("Failed to connect to LiveKit:", error);
       } finally {
@@ -143,6 +144,7 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
       console.log('existingToken:', existingToken);
       setConnectionDetails({ url: import.meta.env.VITE_LIVEKIT_SERVER_URL, token: existingToken });
       setHandedOff(true);
+      setIsLoading(false);
     }    
   };
 
@@ -182,6 +184,10 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
       setLoading(false);
       setConnectionDetails(null);
       setHandedOff(false);
+      localStorage.removeItem('liveKitToken');
+      localStorage.removeItem('sessionId');
+      setToken(null);
+      console.log('disconnected and cleared session');
     };
 
     return (
@@ -321,10 +327,10 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
             
             <div className="lk-custom-control-bar">
               <HangUpButton />
-              {handedOff && (              
+              {(              
                 <TrackToggle source={Track.Source.Microphone} className="lk-custom-toggle-btn" />
               )}
-              {handedOff && (              
+              {(              
                 <div className="lk-settings-menu-container">
                   <button 
                     className={`lk-custom-settings-btn ${showSettings ? 'active' : ''}`}

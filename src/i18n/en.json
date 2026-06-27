@@ -52,6 +52,7 @@
     "connectingAgent": "Connecting with Agent",
     "speakingAgent": "Speaking with Agent",
     "connecting": "Connecting",
+    "disconnected": "Disconnected",
     "hangup": "Hang Up",
     "devices": "Devices",
     "defaultSpeaker": "Default Speaker",
