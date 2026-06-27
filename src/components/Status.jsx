@@ -1,6 +1,9 @@
 import React from 'react';
+import { useLang } from '../i18n/LanguageContext.jsx';
 
-export default function Status({ status }) {
+export default function Status({state}) {
+  const { t, lang } = useLang();
+
   return (
     // Removed max-h constraint and kept simple alignment classes
     <div className="flex items-center justify-end">
@@ -26,7 +29,7 @@ export default function Status({ status }) {
           
           {/* Main Status Text - Swapped to text-xs for compact layout */}
           <span className="text-xs font-medium text-indigo-100 tracking-wider">
-            {status}...
+            {(t('chat.' + state))}...
           </span>
         </div>
         

@@ -9,7 +9,7 @@ import {
   BarVisualizer,
   useMediaDevices, // Swapped for direct lists to completely remove nested dropdowns
   useVoiceAssistant,
-  useLocalParticipant
+  useLocalParticipant  
 } from '@livekit/components-react';
 import { Track, RoomEvent } from 'livekit-client';
 import '@livekit/components-styles';
@@ -18,6 +18,19 @@ import { useLang } from '../i18n/LanguageContext.jsx';
 import Toast from './Toast';
 import Status from './Status.jsx';
 
+const isValidToken = (token) => {
+  try {
+    const payloadBase64 = token.split('.')[1];
+    const decodedJson = JSON.parse(window.atob(payloadBase64));
+    
+    // Check if the current time is less than the expiration timestamp (with a 30s buffer)
+    const bufferSeconds = 30;
+    return decodedJson.exp > (Date.now() / 1000) + bufferSeconds;
+  } catch (e) {
+    return false; // Malformed token
+  }
+};
+
 export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading}) {
   const [connectionDetails, setConnectionDetails] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -25,7 +38,7 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
   const [showSettings, setShowSettings] = useState(false); 
   const [agentState, setAgentState] = useState('initializing');
   const [agentName, setAgentName] = useState('');
-
+  const [token, setToken] = useState(null);  
   const { t, lang } = useLang();
   const [toast, setToast] = useState({ message: '', type: 'success' });
   let toastTimer = null;
@@ -47,31 +60,41 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
     // const tracks = useTracks([{ source: Track.Source.Microphone, updateOnly: true }]);
     // const agentTrack = tracks.find((t) => t.participant.isAgent);
 
-    const { audioTrack } = useVoiceAssistant();
+    const { audioTrack, state: liveKitAgentState } = useVoiceAssistant();    
+    useEffect(() => {
+      if (!liveKitAgentState) return;
+      // This block functions exactly like your event-change listener callback
+      // setAgentState(liveKitAgentState);
+      console.log('agent state change:', liveKitAgentState)
+    }, [liveKitAgentState]);
     
+
     const localParticipant = useLocalParticipant();
     // console.log('localParticipant:', localParticipant)
     const { microphoneTrack } = localParticipant;                   
     
+    /*
     if (handedOff) {
+      console.log('register for agent state changes...')
       const room = useRoomContext();
-        room.on(RoomEvent.ParticipantAttributesChanged, (changedAttributes, participant) => {
-          // Check if the changed attribute belongs to the agent
-          if (participant.identity === agentName) {
-              const agentState = participant.attributes['lk.agent.state'];
-              // console.log("Native Agent State updated to:", agentState);
-              // Output can be: "initializing", "idle", "listening", "thinking", "speaking"
-              setAgentState(agentState);
-              // console.log('agent-state:', agentState);              
-          }
+      room.on(RoomEvent.ParticipantAttributesChanged, (changedAttributes, participant) => {
+        // Check if the changed attribute belongs to the agent
+        if (participant.identity === agentName) {
+            const agentState = participant.attributes['lk.agent.state'];
+            // console.log("Native Agent State updated to:", agentState);
+            // Output can be: "initializing", "idle", "listening", "thinking", "speaking"
+            setAgentState(agentState);
+            // console.log('agent-state:', agentState);              
+        }
       });
     }
-
+    */
+    
     return (
       <div className="lk-voice-visualizer-row">
         <div className="lk-voice-status-text">
           <div className="flex-1 min-w-0">{handedOff ? t('chat.agentListening') : t('chat.connectingAgent') + "..."}</div>
-          <Status status={(t('chat.' + agentState))}/>
+          <Status state={liveKitAgentState} />
         </div>
         <div className="lk-voice-bar-layout">
           {handedOff && microphoneTrack?.track && (
@@ -93,24 +116,34 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
         </div>
       </div>
     );
-  };
+  };  
 
   const startConversation = async () => {
-    setIsLoading(true);
-    const payload = { language: lang, session_id: sessionId, room: "agent-room" };
-    try {
-      const res = await fetch(import.meta.env.VITE_LIVEKIT_TOKEN_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      setConnectionDetails({ url: import.meta.env.VITE_LIVEKIT_SERVER_URL, token: data.token });
-    } catch (error) {
-      console.error("Failed to connect to LiveKit:", error);
-    } finally {
-      setIsLoading(false);
-    }
+    const existingToken = localStorage.getItem('liveKitToken');
+    if (!existingToken || !isValidToken(existingToken)) {
+      setIsLoading(true);    
+      const payload = { language: lang, session_id: sessionId, room: "agent-room" };
+      try {
+        const res = await fetch(import.meta.env.VITE_LIVEKIT_TOKEN_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        setToken(data.token);
+        localStorage.setItem('liveKitToken', data.token);
+        setConnectionDetails({ url: import.meta.env.VITE_LIVEKIT_SERVER_URL, token: data.token });
+      } catch (error) {
+        console.error("Failed to connect to LiveKit:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      setToken(existingToken);
+      console.log('existingToken:', existingToken);
+      setConnectionDetails({ url: import.meta.env.VITE_LIVEKIT_SERVER_URL, token: existingToken });
+      setHandedOff(true);
+    }    
   };
 
   if (!connectionDetails) {
@@ -280,46 +313,45 @@ export default function LiveKitVoiceWidget({sessionId, setMessages, setLoading})
         onDisconnected={() => setConnectionDetails(null)}
         className="lk-my-room-container"
       >
-        <RoomAudioRenderer />
-        <StartAudio label="Allow Agent Voice" /> 
+          <RoomAudioRenderer />
+          <StartAudio label="Allow Agent Voice" /> 
 
-        <div className="lk-voice-panel-body">          
-          <AgentVisualizerRow />
-          
-          <div className="lk-custom-control-bar">
-            <HangUpButton />
-            {handedOff && (              
-              <TrackToggle source={Track.Source.Microphone} className="lk-custom-toggle-btn" />
-            )}
-            {handedOff && (              
-              <div className="lk-settings-menu-container">
-                <button 
-                  className={`lk-custom-settings-btn ${showSettings ? 'active' : ''}`}
-                  onClick={() => setShowSettings(!showSettings)}
-                  aria-label="Toggle audio settings"
-                >
-                  <svg xmlns="http://w3.org" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="lk-settings-icon">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.767a1.123 1.123 0 0 0-.417 1.03c.004.074.006.148.006.222 0 .074-.002.148-.006.222a1.123 1.123 0 0 0 .417 1.03l1.003.767a1.125 1.125 0 0 1 .26 1.43l-1.296 2.247a1.125 1.125 0 0 1-1.37.49l-1.216-.456a1.125 1.125 0 0 0-1.075.124a2.08 2.08 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281a1.125 1.125 0 0 0-.646-.87a2.08 2.08 0 0 1-.22-.127a1.125 1.125 0 0 0-1.074-.124l-1.217.456a1.125 1.125 0 0 1-1.37-.49l-1.296-2.247a1.125 1.125 0 0 1 .26-1.43l1.003-.767a1.122 1.122 0 0 0 .417-1.03a2.07 2.07 0 0 1-.006-.222c0-.074.002-.148.006-.222a1.122 1.122 0 0 0-.417-1.03l-1.003-.767a1.125 1.125 0 0 1-.26-1.43l1.296-2.247a1.125 1.125 0 0 1 1.37-.49l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128c.332-.183.582-.495.644-.869l.214-1.28Z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                  </svg>
-                </button>
+          <div className="lk-voice-panel-body">          
+            <AgentVisualizerRow />
+            
+            <div className="lk-custom-control-bar">
+              <HangUpButton />
+              {handedOff && (              
+                <TrackToggle source={Track.Source.Microphone} className="lk-custom-toggle-btn" />
+              )}
+              {handedOff && (              
+                <div className="lk-settings-menu-container">
+                  <button 
+                    className={`lk-custom-settings-btn ${showSettings ? 'active' : ''}`}
+                    onClick={() => setShowSettings(!showSettings)}
+                    aria-label="Toggle audio settings"
+                  >
+                    <svg xmlns="http://w3.org" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="lk-settings-icon">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.767a1.123 1.123 0 0 0-.417 1.03c.004.074.006.148.006.222 0 .074-.002.148-.006.222a1.123 1.123 0 0 0 .417 1.03l1.003.767a1.125 1.125 0 0 1 .26 1.43l-1.296 2.247a1.125 1.125 0 0 1-1.37.49l-1.216-.456a1.125 1.125 0 0 0-1.075.124a2.08 2.08 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281a1.125 1.125 0 0 0-.646-.87a2.08 2.08 0 0 1-.22-.127a1.125 1.125 0 0 0-1.074-.124l-1.217.456a1.125 1.125 0 0 1-1.37-.49l-1.296-2.247a1.125 1.125 0 0 1 .26-1.43l1.003-.767a1.122 1.122 0 0 0 .417-1.03a2.07 2.07 0 0 1-.006-.222c0-.074.002-.148.006-.222a1.122 1.122 0 0 0-.417-1.03l-1.003-.767a1.125 1.125 0 0 1-.26-1.43l1.296-2.247a1.125 1.125 0 0 1 1.37-.49l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128c.332-.183.582-.495.644-.869l.214-1.28Z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                    </svg>
+                  </button>
 
-                {/* Secure Floating Popup */}
-                {showSettings && (
-                  <div className="lk-floating-device-menu">
-                    <div className="lk-floating-menu-header">
-                      <h4>{t('devices')}</h4>
-                      <button onClick={() => setShowSettings(false)} className="lk-close-menu-btn">×</button>
+                  {/* Secure Floating Popup */}
+                  {showSettings && (
+                    <div className="lk-floating-device-menu">
+                      <div className="lk-floating-menu-header">
+                        <h4>{t('devices')}</h4>
+                        <button onClick={() => setShowSettings(false)} className="lk-close-menu-btn">×</button>
+                      </div>
+                      <DirectDeviceManager />
                     </div>
-                    <DirectDeviceManager />
-                  </div>
-                )}
-              </div>              
-            )}
+                  )}
+                </div>              
+              )}
+            </div>
+            <VoiceboxChatReceiver />          
           </div>
-
-          <VoiceboxChatReceiver />
-        </div>        
       </LiveKitRoom>
       <Toast 
         message={toast.message} 

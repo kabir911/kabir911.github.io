@@ -64,8 +64,15 @@ export default function ChatWidget() {
       document.head.appendChild(styleTag);
     }
 
-    const newSessionId = crypto.randomUUID();
-    setSessionId(newSessionId);
+    const existingSessionId = localStorage.getItem('sessionId');
+    if (!existingSessionId) {
+      const newSessionId = crypto.randomUUID();
+      setSessionId(newSessionId);
+      localStorage.setItem('sessionId', newSessionId);
+    } else {
+      setSessionId(existingSessionId);
+      console.log('existingSession:', existingSessionId);
+    }
   }, []);
 
   // Handler to save the custom user API key
